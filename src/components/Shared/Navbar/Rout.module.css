@@ -1,0 +1,3 @@
+.nav_anim {
+    @apply absolute -bottom-6 left-0 w-full h-0.5 bg-primary_red
+  }

@@ -11,23 +11,23 @@ import { HiArrowUpRight } from 'react-icons/hi2';
 const lists = [
     {
         id: 1,
-        title: "Post a Job"
+        title: "Get More Clients"
     },
     {
         id: 2,
-        title: "Receive Quotes from Contractors"
+        title: "Instant Job Alerts"
     },
     {
         id: 3,
-        title: "Compare & Select the Best Contractor"
+        title: "Flexible Work Schedule"
     },
     {
         id: 4,
-        title: "Confirm & Schedule the Job"
+        title: "Easy Quoting System"
     },
     {
         id: 5,
-        title: "Job Completed & Reviewed"
+        title: "Build Your Reputation"
     },
 ]
 

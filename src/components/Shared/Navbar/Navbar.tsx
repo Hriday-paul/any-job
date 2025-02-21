@@ -23,7 +23,7 @@ export const routes = [
     {
         id: 3,
         name: "Pricing",
-        rout: "/priceing"
+        rout: "/pricing"
     },
     {
         id: 4,

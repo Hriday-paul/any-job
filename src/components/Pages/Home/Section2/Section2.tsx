@@ -86,7 +86,7 @@ const Section2 = () => {
                                         }} viewport={{ once: true }}
                                         key={item?.id} className='flex flex-row gap-x-4 items-center'>
                                         <span className='bg-primary_red h-8 w-8 rounded-full flex justify-center items-center'>
-                                            <FaArrowLeft className='ttext-sm lg:text-base xl:text-lg text-white rotate-180' />
+                                            <FaArrowLeft className='text-sm lg:text-base xl:text-lg text-white rotate-180' />
                                         </span>
                                         <p className='text-[#333333] font-figtree text-sm lg:text-base'>{item?.title}</p>
                                     </motion.li>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "@/components/Shared/Navbar/Navbar";
+import Footer from "@/components/Shared/Footer/Footer";
 
 const Figtree = localFont({
   src: "../font/Figtree-Regular.ttf",
@@ -26,6 +27,7 @@ export default function RootLayout({
       >
         <Navbar />
         {children}
+        <Footer />
       </body>
     </html>
   );

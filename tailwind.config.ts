@@ -10,6 +10,9 @@ export default {
   ],
   theme: {
     extend: {
+      boxShadow: {
+        'form': '0 4px 18px 0 rgba(0, 0, 0, 0.09)',
+      },
       colors: {
         primary_white: '#ffffff',
         primary_gray: '#333333',
@@ -23,6 +26,7 @@ export default {
         success: '#219653',
         danger: '#D34053',
         warning: '#FFA70B',
+        form : "#fffbfb"
       },
       fontFamily: {
         // figtree: 'Figtree'

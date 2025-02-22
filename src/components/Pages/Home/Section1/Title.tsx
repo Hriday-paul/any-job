@@ -74,7 +74,7 @@ export const HomeSearch = () => {
     }, []);
 
     return (
-        <div className='w-8/12 md:w-4/5 relative' ref={searchRef}>
+        <div className='w-8/12 md:w-4/5 relative mx-auto' ref={searchRef}>
             <div className={`bg-white ${open ? "border-b rounded-t-3xl shadow-[0 -1px 3px 0 rgb(0 0 0 / 0.1)] border-x border-t" : "border rounded-full shadow"} border-stroke py-2.5 md:py-3 lg:py-4 pl-2 md:pl-4 pr-12 md:pr-14 flex flex-row justify-between gap-x-1 md:gap-x-3 items-center relative`}>
                 <CiSearch className='text-2xl text-zinc-500' />
                 <input

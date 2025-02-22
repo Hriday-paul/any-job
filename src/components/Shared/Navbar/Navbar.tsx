@@ -82,7 +82,7 @@ const Navbar = () => {
                     <div className='flex flex-row gap-x-5 items-center'>
                         <button className='flex flex-row gap-x-1 items-center font-figtree'>
                             <VscLock className='text-neutral-600 text-sm md:text-lg' />
-                            <Link href='/login' className='text-sm md:text-base'>Login</Link>
+                            <Link href='/signin' className='text-sm md:text-base'>Login</Link>
                         </button>
                         {/* <button className='bg-[#fef1f1] border border-primary_red rounded-full px-4 md:px-6 py-1.5 md:py-2 text-primary_red font-figtree text-sm md:text-base'>
                             <Link href='/signup'>Sign Up</Link>

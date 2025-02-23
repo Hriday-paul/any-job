@@ -58,7 +58,7 @@ const Section2 = () => {
                 </motion.section>
 
                 <motion.h3
-                    initial={{ x: 24, opacity: 0 }}
+                    initial={{ x: -24, opacity: 0 }}
                     whileInView={{
                         x: 0,
                         opacity: 1,

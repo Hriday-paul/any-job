@@ -6,7 +6,7 @@ import OTPInput from "react-otp-input";
 
 const VerifyOtpForm = () => {
     const [otp, setOtp] = useState<string>('0');
-    const nextRout = useSearchParams().get('next') || '/signin'
+    // const nextRout = useSearchParams().get('next') || '/signin'
 
     const navig = useRouter();
 

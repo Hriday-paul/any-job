@@ -9,12 +9,6 @@
   @apply max-w-7xl mx-auto px-4 md:px-6;
 }
 
-@layer base {
-  :root {
-    --radius: 0.5rem
-  }
-}
-
 
 .authTab {
   @apply absolute top-0 left-0 w-full h-14 bg-primary_red text-white rounded-md
@@ -23,3 +17,7 @@
 .otpinputStyle {
   @apply !w-8 md:!w-12 h-8 md:h-12 mx-1 md:mx-2 font-figtree font-medium border focus:!border-stroke duration-200 rounded-sm text-black outline-none bg-transparent text-lg md:text-xl
 }
+
+
+
+@layer base {}

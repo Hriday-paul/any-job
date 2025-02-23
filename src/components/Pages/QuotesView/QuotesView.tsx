@@ -70,7 +70,7 @@ export function QuotesView({ clicker }: { clicker: React.ReactNode }) {
                     <div className="space-y-5">
                         {/* Header with profile info and close button */}
                         <div className="flex justify-between items-start">
-                            <Link href='/contructor/45' className="flex gap-3">
+                            <Link href='/profile/45' className="flex gap-3">
                                 <Image
                                     src={userImg}
                                     alt="Profile picture"
@@ -125,7 +125,7 @@ export function QuotesView({ clicker }: { clicker: React.ReactNode }) {
                             <button onClick={clickConfirm} className="w-full bg-primary_red hover:bg-opacity-85 text-white font-medium px-4 py-2.5 rounded-md transition-colors font-figtree">
                                 Confirm
                             </button>
-                            <Link href='/contructor/45'>
+                            <Link href='/profile/45'>
                                 <button className="w-full bg-primary_red hover:bg-opacity-85 text-white font-medium px-4 py-2.5 rounded-md transition-colors font-figtree">
                                     View Profile
                                 </button>

@@ -6,7 +6,8 @@ import React from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { ImSpinner2 } from 'react-icons/im';
 import { motion } from "motion/react"
-// import MultipleSelect from '@/components/Shared/MultiSelect';
+import MultipleSelect from '@/components/Shared/MultiSelect';
+import { services } from '../../../../utils/default';
 
 type signUpType = {
     firstName: string,
@@ -110,18 +111,25 @@ const SignUpForm = () => {
                         {errors?.email && <p className="text-red-500 text-sm col-span-2">{errors?.email?.message}</p>}
                     </div>
 
-                    {/* <div>
-                        <MultipleSelect name='service' options={[
-                            {
-                                label: "Responsible",
-                                value: "responsible",
-                            },
-                            {
-                                label: "Funny",
-                                value: "funny",
-                            },
-                        ]} control={control} placeholder='select service' />
-                    </div> */}
+                    {/* ---------------service---------------- */}
+                    <div className='w-full mx-auto mb-4'>
+                        <label htmlFor='service' className="mb-1.5 block text-black font-medium dark:text-white font-figtree">
+                            Which type of service offer you want to add?
+                            <span className="text-red-500 text-base ml-1">*</span>
+                        </label>
+                        <MultipleSelect
+                            name='service'
+                            items={services?.map(ser => {
+                                return { label: ser, value: ser }
+                            })}
+                            control={control}
+                            errors={errors}
+                            placeholder='select service'
+                            validationRules={{
+                                required: "Service is required",
+                            }}
+                        />
+                    </div>
 
                     {/* -----------------Password Input-------------- */}
                     <div className="w-full mx-auto mb-4">

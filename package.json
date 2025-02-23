@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -p 7004",
     "build": "next build",
-    "start": "next start -p 7004",
+    "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
@@ -34,7 +34,7 @@
     "react-otp-input": "^3.1.1",
     "react-rating": "^2.0.5",
     "sweetalert2": "^11.17.2",
-    "tailwind-merge": "^3.0.1",
+    "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7",
     "yet-another-react-lightbox": "^3.21.7"
   },

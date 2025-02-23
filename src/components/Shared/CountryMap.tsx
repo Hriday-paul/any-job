@@ -4,7 +4,7 @@ import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
 
 const mapKey = process.env.NEXT_PUBLIC_MAP_KEY!
 
-const CountryMap = ({ setSelectedCountry }: { setSelectedCountry: React.Dispatch<React.SetStateAction<string | null>> }) => {
+const CountryMap = ({ setSelectedCountry, height = '500px' }: { setSelectedCountry: React.Dispatch<React.SetStateAction<string | null>>, height ?: string }) => {
 
     const [map, setMap] = useState<google.maps.Map | null>(null);
     const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);
@@ -41,7 +41,7 @@ const CountryMap = ({ setSelectedCountry }: { setSelectedCountry: React.Dispatch
         <div>
             <LoadScript googleMapsApiKey={mapKey}>
                 <GoogleMap
-                    mapContainerStyle={{ height: "500px", width: "100%" }}
+                    mapContainerStyle={{ height: height, width: "100%" }}
                     center={coordinates || {
                         "lat": 53.41291,
                         "lng": -8.24389

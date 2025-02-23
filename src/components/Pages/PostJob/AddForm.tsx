@@ -79,7 +79,7 @@ const AddForm = () => {
                 title: "text-2xl text-black font-figtree",
                 container: "text-sm font-medium font-figtree text-zinc-800",
                 cancelButton: "bg-primary_red text-white",
-                confirmButton : "bg-primary_red text-white"
+                confirmButton: "bg-primary_red text-white"
             },
             icon: 'success',
             showCancelButton: true,
@@ -99,6 +99,7 @@ const AddForm = () => {
                 <Image src={jobDetailsIcon} placeholder='blur' className='w-auto h-5 lg:h-7 object-cover' alt="any job details icon" />
                 <h5 className='text-xl lg:text-2xl font-extrabold text-black font-figtree'>Job Details</h5>
             </div>
+
             <form onSubmit={handleSubmit(handleFormSubmit)} className=''>
 
                 {/* ----------details-------------- */}
@@ -356,7 +357,7 @@ const AddForm = () => {
                         onChange={fileonChange}
                         className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree dark:text-white border-strokeinput focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary`}
                     />
-                    {errors?.budget && <p className="text-red-500 text-sm col-span-2">{errors?.budget?.message}</p>}
+                    
                     <div className='mt-2'>
                         {
                             images?.map((img, indx) => {

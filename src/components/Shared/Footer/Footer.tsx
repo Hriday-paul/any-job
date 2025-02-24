@@ -12,7 +12,7 @@ const Footer = () => {
         {
             id: 2,
             name: "Service",
-            rout: "/service"
+            rout: "/services"
         },
         {
             id: 3,

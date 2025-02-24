@@ -23,7 +23,7 @@ const SignInForm = () => {
 
     const handleFormSubmit: SubmitHandler<signInType> = async (data) => {
         console.log(data)
-        router.push('/')
+        router.push('/contructor')
     }
 
     const isLoading = false;

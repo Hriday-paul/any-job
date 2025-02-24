@@ -104,7 +104,7 @@ const Section3 = () => {
                             </div>
                             <div>
                                 <h3 className='font-figtree text-xl leading-5 text-black font-medium pb-1.5'>Save up to 50% in Yearly plan.</h3>
-                                <Link href={'/'} className='text-primary_red font-figtree font-medium flex flex-row gap-x-3 items-center group'>
+                                <Link href={'/pricing'} className='text-primary_red font-figtree font-medium flex flex-row gap-x-3 items-center group'>
                                     Join Now
                                     <HiArrowUpRight className='text-xl rotate-45 mt-0.5 group-hover:rotate-0 duration-300' />
                                     <span className='-ml-[37px] h-8 w-8 bg-[#ffe3e5] rounded-full mt-0.5'></span>

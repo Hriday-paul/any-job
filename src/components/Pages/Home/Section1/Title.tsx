@@ -43,16 +43,16 @@ const Title = () => {
 export default Title;
 
 const recentSearches = [
-    "shadcn",
-    "react search",
-    "mov to mp4",
-    "figtree font",
+    "clean",
+    "flooring",
+    "service",
+    "contructor",
     "sassa",
     "google",
-    "react icons",
-    "rgba to hex",
-    "tailwind button",
-    "html telephone link"
+    "plambing",
+    "event plan",
+    "john smith",
+    "oconner"
 ]
 
 export const HomeSearch = () => {
@@ -123,7 +123,7 @@ export const TrendingJobLink = () => {
                 }
             }}
             className='max-w-36 mx-auto group pb-5'>
-            <Link href={'/'} className='text-primary_red font-figtree flex flex-row gap-x-3 items-center justify-center'>
+            <Link href={'/services'} className='text-primary_red font-figtree flex flex-row gap-x-3 items-center justify-center'>
                 Trending Jobs
                 <HiArrowUpRight className='text-xl rotate-45 mt-0.5 group-hover:rotate-0 duration-300' />
                 <span className='-ml-[37px] h-8 w-8 bg-[#ffe3e5] rounded-full mt-0.5'></span>

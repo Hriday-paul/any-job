@@ -20,6 +20,7 @@ import contact_icon from '../../../../public/contact_icon.png'
 import jobDetailsIcon from '../../../../public/job_details_icon.png'
 import { ImSpinner2 } from "react-icons/im";
 import Swal from 'sweetalert2'
+import SelectJobLocation from '@/components/Shared/SelectJobLocation';
 
 export type postJobType = {
     description: string,
@@ -39,6 +40,7 @@ export type postJobType = {
 
 const AddForm = () => {
     const [images, setImages] = useState<File[]>([]);
+    const [coordinates, setCoordinates] = useState<{ lat: number, lng: number } | null>(null)
     const {
         register,
         handleSubmit,
@@ -151,6 +153,17 @@ const AddForm = () => {
                     </Controller>
                     {errors?.service && <p className="text-red-500 text-sm col-span-2">{errors?.service?.message}</p>}
                 </div>
+
+
+                {/* ---------select job location------------ */}
+                <div className="w-full mx-auto mb-5 mt-5">
+                    <label htmlFor='loc' className="mb-1.5 block text-black dark:text-white font-figtree">
+                        Select Job Location
+                        <span className="text-red-500 text-base ml-1">*</span>
+                    </label>
+                    <SelectJobLocation coordinates={coordinates} setCoordinates={setCoordinates} height='300px' />
+                </div>
+
 
                 {/* ------------------------county------------------ */}
                 <div className="w-full mx-auto mb-3">
@@ -357,7 +370,7 @@ const AddForm = () => {
                         onChange={fileonChange}
                         className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree dark:text-white border-strokeinput focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary`}
                     />
-                    
+
                     <div className='mt-2'>
                         {
                             images?.map((img, indx) => {

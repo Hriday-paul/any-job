@@ -13,6 +13,7 @@ import serviceIcon from '../../../../public/service.png'
 import coinIcon from '../../../../public/coin_frame.png'
 import workIcon from '../../../../public/work.png'
 import CountryMap from '@/components/Shared/CountryMap';
+import MapWithDrawing from '@/components/Shared/MapWithDrawing';
 
 export type editProfileType = {
     firstName: string,
@@ -223,7 +224,7 @@ const EditProfileForm = () => {
                     Location
                     {/* <span className="text-red-500 text-base ml-1">*</span> */}
                 </label>
-                <CountryMap height='300px' setSelectedCountry={setSelectedCountry} />
+                <MapWithDrawing height='300px' />
             </div>
 
             {/* ------------------------county------------------ */}

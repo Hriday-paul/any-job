@@ -4,6 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import React, { useState } from 'react';
 import { counties } from '../../../../utils/default';
 import { useRouter } from 'next/navigation';
+import MapWithDrawing from '@/components/Shared/MapWithDrawing';
 
 const LocationForm = () => {
     const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
@@ -15,17 +16,17 @@ const LocationForm = () => {
 
     return (
         <div>
-            <CountryMap setSelectedCountry={setSelectedCountry} />
+            {/* <CountryMap setSelectedCountry={setSelectedCountry} /> */}
+
+            <MapWithDrawing />
 
             <div className="w-full mx-auto my-5">
-                <label htmlFor='brand' className="mb-1.5 block text-black dark:text-white font-figtree">
+                {/* <label htmlFor='brand' className="mb-1.5 block text-black dark:text-white font-figtree">
                     Select the counties you would like to receive jobs in?
                     <span className="text-red-500 text-base ml-1">*</span>
-                </label>
-                <Select
-                // onValueChange={field.onChange}
-                // defaultValue={field.value}
-
+                </label> */}
+                {/* <Select
+                
                 >
                     <SelectTrigger className={`bg-zinc-100 px-4 py-3 rounded-md  text-sm font-figtree w-full text-primary border border-stroke`}>
                         <SelectValue placeholder={"Select County"} />
@@ -37,7 +38,7 @@ const LocationForm = () => {
                             })
                         }
                     </SelectContent>
-                </Select>
+                </Select> */}
 
                 <div className='grid grid-cols-2 gap-x-5 items-center my-5'>
                     <button onClick={handleClick} className="w-full bg-primary_red hover:bg-opacity-85 text-white font-medium px-4 py-3 rounded-md transition-colors font-figtree">

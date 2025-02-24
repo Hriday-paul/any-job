@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "@/components/Shared/Navbar/Navbar";
 import Footer from "@/components/Shared/Footer/Footer";
+import NextJsTopLoader from "@/components/Shared/NextJsTopLoader";
 
 const Figtree = localFont({
   src: "../font/Figtree-Regular.ttf",
@@ -25,6 +26,7 @@ export default function RootLayout({
       <body
         className={`${Figtree.variable} antialiased`}
       >
+        <NextJsTopLoader />
         <Navbar />
         {children}
         <Footer />

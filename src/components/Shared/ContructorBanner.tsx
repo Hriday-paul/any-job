@@ -30,7 +30,7 @@ const contructorRouts = [
         id: 4,
         name: "Logout",
         icon: <LuLogOut className='text-sm md:text-base rotate-180' />,
-        rout: "/contructor/logout"
+        rout: "/"
     },
 ];
 

@@ -97,7 +97,7 @@ const Section2 = () => {
                             <Image src={manImg} className='h-20 w-36 lg:w-40 object-cover rounded-2xl' placeholder='blur' alt="any job man image" />
                             <section className='space-y-2'>
                                 <p className='text-[#252525] font-figtree text-lg font-normal'>Simple & Fast </p>
-                                <Link href="/" className='text-primary_red font-figtree font-extrabold text-base lg:text-lg xl:text-xl relative'>Get Started
+                                <Link href="/postjob" className='text-primary_red font-figtree font-extrabold text-base lg:text-lg xl:text-xl relative'>Get Started
                                     <motion.span
                                         initial={{ width: 0 }}
                                         whileInView={{

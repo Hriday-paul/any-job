@@ -10,7 +10,7 @@ import userImg from "../../../../public/quotes/user.jpeg"
 const ContractorCard = () => {
     return (
         <div className='shadow-md bg-white rounded-lg p-5 group'>
-            <Link href='/contructor/34' className="">
+            <Link href='/profile/32' className="">
                 <Image
                     src={serviceImg1}
                     placeholder='blur'
@@ -23,7 +23,7 @@ const ContractorCard = () => {
             <div className="space-y-4">
                 <div className="space-y-2.5">
                     <h2 className="text-base font-medium text-gray-900 line-clamp-2 font-figtree pt-2">
-                        <Link href='/contructor/34'>
+                        <Link href='/profile/34'>
                             {"Hi, I'm John O'Conner, a dedicated home service contractor with over a decade of experience in maintaining residential properties and electrical services. My goal is to ensure that every home receives the highest standard of care."}
                         </Link>
                     </h2>
@@ -38,7 +38,7 @@ const ContractorCard = () => {
 
                 <div className="flex items-center justify-between">
 
-                    <Link href='/contructor/34'>
+                    <Link href='/profile/32'>
                         <div className="flex items-center gap-3">
                             <Image src={userImg} placeholder='blur' alt="contructor profile picture" width={1000} height={1000} className="rounded-md h-10 w-10 object-cover" />
                             <div className="space-y-1">
@@ -52,7 +52,7 @@ const ContractorCard = () => {
                         </div>
                     </Link>
 
-                    <Link href={'/'} className='text-primary_red font-figtree flex flex-row gap-x-3 items-center justify-center'>
+                    <Link href={'/profile/32'} className='text-primary_red font-figtree flex flex-row gap-x-3 items-center justify-center'>
                         <HiArrowUpRight className='text-xl rotate-45 mt-0.5 group-hover:rotate-0 duration-300' />
                         <span className='-ml-[37px] h-8 w-8 bg-[#ffe3e5] rounded-full mt-0.5'></span>
                     </Link>

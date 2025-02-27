@@ -32,9 +32,9 @@ const Section1 = () => {
 
                         <HomeSearch />
 
-                        <Link href="/quotes" className="rounded-full px-2 md:px-2.5 lg:px-3 py-2 md:py-2.5 lg:py-3 m-1 overflow-hidden relative group cursor-pointer border font-medium border-red-200 bg-[#ffe5e5] shadow w-4/12 md:w-1/5 text-center ">
+                        <Link href="/postjob" className="rounded-full px-2 md:px-2.5 lg:px-3 py-2 md:py-2.5 lg:py-3 m-1 overflow-hidden relative group cursor-pointer border font-medium border-red-200 bg-[#ffe5e5] shadow w-4/12 md:w-2/5 text-center ">
                             <span className="absolute w-64 h-0 transition-all duration-300 origin-center rotate-45 -translate-x-20 bg-primary_red top-1/2 group-hover:h-64 group-hover:-translate-y-32 ease"></span>
-                            <span className="relative text-primary_red transition duration-300 group-hover:text-white ease text-sm md:text-sm lg:text-base font-figtree">Get Quotes</span>
+                            <span className="relative text-primary_red transition duration-300 group-hover:text-white ease text-sm md:text-sm lg:text-base font-figtree">Poat Your Job & Get Quotes</span>
                         </Link>
 
                     </motion.div >

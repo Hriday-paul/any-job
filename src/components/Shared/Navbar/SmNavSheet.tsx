@@ -33,7 +33,7 @@ const SmNavSheet = () => {
                         <div className=''>
 
                             <h1 className="text-2xl text-primary_red font-extrabold font-figtree text-secondary select-none cursor-pointer text-left -mt-1 mb-6">
-                                <Link href='/'>Any Job</Link>
+                                <Link href='/'>AnyJob</Link>
                             </h1>
 
 

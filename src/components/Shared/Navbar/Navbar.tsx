@@ -63,7 +63,7 @@ const Navbar = () => {
                 <div className='container flex flex-row justify-between items-center py-4 font-figtree text-xs md:text-sm'>
                     <div className='flex flex-row gap-x-16 items-center'>
                         <h1 className="text-2xl lg:text-3xl xl:text-4xl font-extrabold font-figtree text-primary_red select-none cursor-pointer">
-                            <Link href='/'>Any Job</Link>
+                            <Link href='/'>AnyJob</Link>
                         </h1>
                         <ul className='flex-row gap-6 items-center hidden lg:flex'>
                             {

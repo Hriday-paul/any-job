@@ -25,6 +25,7 @@ const data = [
     {
         name: "Hriday Paul",
         phone: "+8801678678768",
+        job_create_date : "Jan 10, 2025 - 09 AM",
         date: "Feb 10, 2025 - 10 AM",
         price: 250,
         status: "In pregress",
@@ -33,6 +34,7 @@ const data = [
     {
         name: "Seanokane",
         phone: "+8801678678768",
+        job_create_date : "Jan 10, 2025 - 09 AM",
         date: "Feb 10, 2025 - 10 AM",
         price: 180,
         status: "Complete",
@@ -41,6 +43,7 @@ const data = [
     {
         name: "Hriday Paul",
         phone: "+8801678678768",
+        job_create_date : "Jan 10, 2025 - 09 AM",
         date: "Feb 15, 2025 - 10 AM",
         price: 50,
         status: "Cancel",
@@ -49,6 +52,7 @@ const data = [
     {
         name: "Hriday Paul",
         phone: "+8801678678768",
+        job_create_date : "Jan 10, 2025 - 09 AM",
         date: "Feb 10, 2025 - 10 AM",
         price: 250,
         status: "In pregress",
@@ -57,6 +61,7 @@ const data = [
     {
         name: "Seanokane",
         phone: "+8801678678768",
+        job_create_date : "Jan 10, 2025 - 09 AM",
         date: "Feb 10, 2025 - 10 AM",
         price: 180,
         status: "Complete",
@@ -72,6 +77,8 @@ function MyJobTable() {
                     <TableRow className="!rounded-t-lg">
                         <TableHead className="p-5 !rounded-tl-lg font-medium font-figtree">Name</TableHead>
                         <TableHead className="font-medium font-figtree">Phone</TableHead>
+                        <TableHead className="font-medium font-figtree">Job created</TableHead>
+                        <TableHead className="font-medium font-figtree">Job completed</TableHead>
                         <TableHead className="font-medium font-figtree">Price</TableHead>
                         <TableHead className="font-medium font-figtree min-w-32">Status</TableHead>
                         <TableHead className="font-medium font-figtree">Payment</TableHead>
@@ -83,6 +90,8 @@ function MyJobTable() {
                         <TableRow key={job?.name}>
                             <TableCell className="font-medium p-5">{job?.name}</TableCell>
                             <TableCell>{job?.phone}</TableCell>
+                            <TableCell>{job?.job_create_date}</TableCell>
+                            <TableCell>{job?.date}</TableCell>
                             <TableCell>${job?.price}</TableCell>
                             <TableCell>
                                 {job?.status == 'Cancel' ? <span className="bg-primary_red/20 text-primary_red px-2.5 py-1 rounded-full">Cancel</span> : job?.status == 'Complete' ? <span className="bg-success/20 text-success px-2.5 py-1 rounded-full">Complete</span> : <span className="bg-black/20 text-black px-2.5 py-1 rounded-full text-sm">In pregress</span>}

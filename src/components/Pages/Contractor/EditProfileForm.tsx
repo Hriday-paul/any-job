@@ -165,67 +165,6 @@ const EditProfileForm = () => {
                 {errors?.phone && <p className="text-red-500 text-sm col-span-2">{errors?.phone?.message}</p>}
             </div>
 
-            {/* ----------------experience--------------- */}
-            <div className="w-full mx-auto mb-3">
-                <label htmlFor='experience' className="mb-1.5 block text-black dark:text-white font-figtree">
-                    Experience
-                    <span className="text-red-500 text-base ml-1">*</span>
-                </label>
-                <input
-                    type="number"
-                    id='experience'
-                    {...register("experience", { required: true })}
-                    placeholder="Enter experience"
-                    className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.experience ? 'border-danger' : 'dark:text-white border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
-                />
-                {errors?.experience && <p className="text-red-500 text-sm col-span-2">{errors?.experience?.message}</p>}
-            </div>
-
-            {/* ----------------bio--------------- */}
-            <div className="w-full mx-auto mb-3">
-                <label htmlFor='bio' className="mb-1.5 block text-black dark:text-white font-figtree">
-                    Biography
-                    <span className="text-red-500 text-base ml-1">*</span>
-                </label>
-                <textarea
-                    rows={5}
-                    id='bio'
-                    {...register("bio", { required: true })}
-                    placeholder="Write your bio.........."
-                    className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.bio ? 'border-danger' : 'dark:text-white border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
-                />
-                {errors?.bio && <p className="text-red-500 text-sm col-span-2">{errors?.bio?.message}</p>}
-            </div>
-
-            {/* ----------------bio--------------- */}
-            <div className="w-full mx-auto mb-3">
-                <label htmlFor='Why choose me' className="mb-1.5 block text-black dark:text-white font-figtree">
-                    Why choose me
-                    <span className="text-red-500 text-base ml-1">*</span>
-                </label>
-                <textarea
-                    rows={5}
-                    id='Why choose me'
-                    {...register("why_choose", { required: true })}
-                    placeholder="Write why choose.........."
-                    className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.why_choose ? 'border-danger' : 'dark:text-white border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
-                />
-                {errors?.why_choose && <p className="text-red-500 text-sm col-span-2">{errors?.why_choose?.message}</p>}
-            </div>
-
-            <div className='flex items-center gap-x-2 py-3 lg:py-4'>
-                <Image src={locationIcon} placeholder='blur' className='w-auto h-5 lg:h-7 object-cover' alt="any job details icon" />
-                <h5 className='text-lg lg:text-xl font-extrabold text-black font-figtree'>Location</h5>
-            </div>
-
-            {/* --------------------location map---------------- */}
-            <div className="w-full mx-auto mb-3">
-                <label htmlFor='location' className="mb-1.5 block text-black dark:text-white font-figtree">
-                    Location
-                    {/* <span className="text-red-500 text-base ml-1">*</span> */}
-                </label>
-                <MapWithDrawing height='300px' />
-            </div>
 
             {/* ------------------------county------------------ */}
             <div className="w-full mx-auto mb-3">
@@ -276,6 +215,75 @@ const EditProfileForm = () => {
                 />
                 {errors?.town && <p className="text-red-500 text-sm col-span-2">{errors?.town?.message}</p>}
             </div>
+            
+
+            {/* ----------------experience--------------- */}
+            <div className="w-full mx-auto mb-3">
+                <label htmlFor='experience' className="mb-1.5 block text-black dark:text-white font-figtree">
+                    Experience
+                    <span className="text-red-500 text-base ml-1">*</span>
+                </label>
+                <input
+                    type="number"
+                    id='experience'
+                    {...register("experience", { required: true })}
+                    placeholder="Enter experience"
+                    className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.experience ? 'border-danger' : 'dark:text-white border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
+                />
+                {errors?.experience && <p className="text-red-500 text-sm col-span-2">{errors?.experience?.message}</p>}
+            </div>
+
+            {/* ----------------bio--------------- */}
+            <div className="w-full mx-auto mb-3">
+                <label htmlFor='bio' className="mb-1.5 block text-black dark:text-white font-figtree">
+                    Biography
+                    <span className="text-red-500 text-base ml-1">*</span>
+                </label>
+                <textarea
+                    rows={5}
+                    id='bio'
+                    {...register("bio", { required: true })}
+                    placeholder="Write your bio.........."
+                    className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.bio ? 'border-danger' : 'dark:text-white border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
+                />
+                {errors?.bio && <p className="text-red-500 text-sm col-span-2">{errors?.bio?.message}</p>}
+            </div>
+
+            {/* ----------------bio--------------- */}
+            <div className="w-full mx-auto mb-3">
+                <label htmlFor='Why choose me' className="mb-1.5 block text-black dark:text-white font-figtree">
+                    Why choose me
+                    <span className="text-red-500 text-base ml-1">*</span>
+                </label>
+                <textarea
+                    rows={5}
+                    id='Why choose me'
+                    {...register("why_choose", { required: true })}
+                    placeholder="Write why choose.........."
+                    className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.why_choose ? 'border-danger' : 'dark:text-white border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
+                />
+                {errors?.why_choose && <p className="text-red-500 text-sm col-span-2">{errors?.why_choose?.message}</p>}
+            </div>
+
+
+            
+
+            <div className='flex items-center gap-x-2 py-3 lg:py-4'>
+                <Image src={locationIcon} placeholder='blur' className='w-auto h-5 lg:h-7 object-cover' alt="any job details icon" />
+                <h5 className='text-lg lg:text-xl font-extrabold text-black font-figtree'>Location</h5>
+            </div>
+            
+
+            {/* --------------------location map---------------- */}
+            <div className="w-full mx-auto mb-3">
+                <label htmlFor='location' className="mb-1.5 block text-black dark:text-white font-figtree">
+                    Choose the areas where you can provide your service?
+                    {/* <span className="text-red-500 text-base ml-1">*</span> */}
+                </label>
+                <MapWithDrawing height='300px' />
+            </div>
+
+            
 
             <div className='flex items-center gap-x-2 py-3 lg:py-4'>
                 <Image src={serviceIcon} placeholder='blur' className='w-auto h-5 lg:h-7 object-cover' alt="any job details icon" />

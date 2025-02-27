@@ -35,7 +35,7 @@ const Footer = () => {
             <div className='container py-10 md:py-16 px-10'>
                 <div className='bg-white rounded-3xl p-8'>
                     <h3 className="text-3xl lg:text-3xl xl:text-4xl font-extrabold font-figtree text-primary_red select-none cursor-pointer text-center mb-3 md:mb-5">
-                        <Link href='/'>Any Job</Link>
+                        <Link href='/'>AnyJob</Link>
                     </h3>
                     <p className='text-center font-figtree text-zinc-700 text-sm md:text-base'>AnyJob is a trusted job marketplace designed to connect clients (job posters) with skilled contractors across various industries. Whether you need a plumber, electrician, carpenter, personal trainer, or digital expert, AnyJob makes hiring fast, simple, and secure.</p>
 

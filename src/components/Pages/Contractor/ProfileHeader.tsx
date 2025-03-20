@@ -5,6 +5,7 @@ import { Clock, Mail, MapPin, Phone, Star } from 'lucide-react';
 import Link from 'next/link';
 import { userResType } from '@/redux/types';
 import { placeHolderBlurImg } from '../../../../utils/default';
+import { FaArrowLeft } from 'react-icons/fa6';
 
 const ProfileHeader = ({ isEditable = false, profileData, isPublic = true }: { isEditable?: boolean, profileData?: userResType, isPublic?: boolean }) => {
     return (
@@ -68,8 +69,11 @@ const ProfileHeader = ({ isEditable = false, profileData, isPublic = true }: { i
 
             </div>
             {
-                isEditable && <Link href='/contructor/my-subscription' className='text-primary_red py-2 font-figtree text-secondary rounded-md w-full mt-5 hover:bg-opacity-90 duration-200 flex flex-row gap-x-2 items-center max-w-48 md:max-w-full'>
-                    My Subscription
+                isEditable && <Link href='/contructor/my-subscription' className='text-primary_red py-2 font-figtree text-secondary rounded-md w-full mt-5 hover:bg-opacity-90 duration-200 flex flex-row gap-x-2 items-center max-w-full'>
+                    <span className='bg-red-100 h-8 w-8 rounded-full flex justify-center items-center'>
+                        <FaArrowLeft className='ttext-sm lg:text-base xl:text-lg text-primary_red rotate-180' />
+                    </span>
+                    Manage Your Subscription
                 </Link>
             }
         </div>

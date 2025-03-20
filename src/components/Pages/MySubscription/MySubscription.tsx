@@ -18,7 +18,7 @@ const MySubscription = () => {
                 <h2 className='text-xl md:text-2xl lg:text-3xl xl:text-3xl text-center font-figtree font-extrabold py-8'>Your Current Subscription Plan</h2>
                 {
                     isLoading ?
-                        <div className='grid grid-cols-1 justify-center items-center mx-auto'>
+                        <div className='flex justify-center items-center mx-auto'>
                             <PricingCardSkeloton />
                         </div>
                         :

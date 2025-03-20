@@ -14,9 +14,7 @@ import { RiMenu3Fill } from 'react-icons/ri';
 import { FaArrowLeftLong } from 'react-icons/fa6';
 import { motion } from "motion/react"
 import { routes } from './Navbar';
-// import Profile from './Profile';
 
-//{ routs }: { routs: { id: number, name: string, rout: string }[] }
 const SmNavSheet = () => {
 
     return (
@@ -35,9 +33,6 @@ const SmNavSheet = () => {
                             <h1 className="text-2xl text-primary_red font-extrabold font-figtree text-secondary select-none cursor-pointer text-left -mt-1 mb-6">
                                 <Link href='/'>AnyJob</Link>
                             </h1>
-
-
-                            {/* <Profile smScreen={true} user={user} isLoading={isLoading} /> */}
 
 
                             <ul className="my-3">

@@ -1,6 +1,4 @@
 import LocationForm from '@/components/Pages/auth/LocationForm';
-import { HomeSearch } from '@/components/Pages/Home/Section1/Title';
-import CountryMap from '@/components/Shared/CountryMap';
 import React from 'react';
 
 const page = () => {
@@ -13,9 +11,7 @@ const page = () => {
                         <p className='text-xl font-figtree text-zinc-600 font-medium max-w-xl mx-auto text-center'>Allow location access to get job recommendations and nearby clients.</p>
                     </div>
 
-                    {/* <div className={"max-w-full md:max-w-xl lg:max-w-2xl mx-auto my-3 -mt-5 md:-mt-12 lg:-mt-16 xl:-mt-20 pt-5"}>
-                        <HomeSearch />
-                    </div> */}
+                   
 
                 </div>
 

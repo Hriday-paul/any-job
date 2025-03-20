@@ -1,6 +1,6 @@
 "use client"
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { HiOutlineMail } from 'react-icons/hi';
 import { LiaPhoneVolumeSolid } from 'react-icons/lia';
 import { VscLock } from 'react-icons/vsc';
@@ -8,6 +8,11 @@ import SmNavSheet from './SmNavSheet';
 import { usePathname } from 'next/navigation';
 import styles from './Rout.module.css'
 import { motion } from "motion/react"
+import { useGetUserProfileQuery } from '@/redux/api/authApi';
+import NavProfile from './NavProfile';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from '@/redux/store';
+import { addUserDetails } from '@/redux/slices/userSlice';
 
 export const routes = [
     {
@@ -24,16 +29,33 @@ export const routes = [
         id: 3,
         name: "Pricing",
         rout: "/pricing"
-    },
-    {
-        id: 4,
-        name: "Get Quotes",
-        rout: "/quotes"
     }
 ]
 
 const Navbar = () => {
+    const { isLoading, data: res, isSuccess, isError } = useGetUserProfileQuery();
+
     const pathName = usePathname();
+
+    const dispatch = useDispatch();
+    const { user } = useSelector((state: RootState) => state.userSlice);
+
+    useEffect(() => {
+        if (isSuccess) {
+            dispatch(addUserDetails({
+                firstName: res?.data?.firstName,
+                profilePicture: res?.data?.profilePicture,
+            }))
+        }
+        if (isError) {
+            dispatch(addUserDetails({
+                firstName: '',
+                profilePicture: '',
+            }))
+        }
+    }, [isSuccess, res, dispatch, isError])
+
+
     return (
         <div>
             {/* ---------------------------section1------------------- */}
@@ -80,21 +102,21 @@ const Navbar = () => {
                         </ul>
                     </div>
                     <div className='flex flex-row gap-x-5 items-center'>
-                        <button className='flex flex-row gap-x-1 items-center font-figtree'>
-                            <VscLock className='text-neutral-600 text-sm md:text-lg' />
-                            <Link href='/signin' className='text-sm md:text-base'>Login</Link>
-                        </button>
-                        {/* <button className='bg-[#fef1f1] border border-primary_red rounded-full px-4 md:px-6 py-1.5 md:py-2 text-primary_red font-figtree text-sm md:text-base'>
-                            <Link href='/signup'>Sign Up</Link>
-                        </button> */}
 
-                        <Link href='/signup' className="relative inline-block font-figtree text-sm md:text-base group">
-                            <span className="relative z-10 block px-4 md:px-6 py-1.5 md:py-2 overflow-hidden font-medium leading-tight transition-colors duration-300 ease-out border border-red-400 rounded-full group-hover:text-white text-primary_red">
-                                <span className="absolute inset-0 w-full h-full px-4 md:px-6 py-1.5 md:py-2 rounded-lg bg-[#fef1f1]"></span>
-                                <span className="absolute left-0 w-48 h-48 -ml-2 transition-all duration-300 origin-top-right -rotate-90 -translate-x-full translate-y-12 bg-primary_red group-hover:-rotate-180 ease"></span>
-                                <span className="relative">Sign Up </span>
-                            </span>
-                        </Link>
+                        {user?.firstName ? <NavProfile isLoading={isLoading} user={user} /> : <>
+                            <button className='flex flex-row gap-x-1 items-center font-figtree'>
+                                <VscLock className='text-neutral-600 text-sm md:text-lg' />
+                                <Link href='/signin' className='text-sm md:text-base'>Login</Link>
+                            </button>
+
+                            <Link href='/signup' className="relative inline-block font-figtree text-sm md:text-base group">
+                                <span className="relative z-10 block px-4 md:px-6 py-1.5 md:py-2 overflow-hidden font-medium leading-tight transition-colors duration-300 ease-out border border-red-400 rounded-full group-hover:text-white text-primary_red">
+                                    <span className="absolute inset-0 w-full h-full px-4 md:px-6 py-1.5 md:py-2 rounded-lg bg-[#fef1f1]"></span>
+                                    <span className="absolute left-0 w-48 h-48 -ml-2 transition-all duration-300 origin-top-right -rotate-90 -translate-x-full translate-y-12 bg-primary_red group-hover:-rotate-180 ease"></span>
+                                    <span className="relative">Sign Up </span>
+                                </span>
+                            </Link>
+                        </>}
 
                         <section className='lg:hidden'>
                             <SmNavSheet />

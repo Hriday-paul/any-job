@@ -14,15 +14,11 @@ import "yet-another-react-lightbox/styles.css";
 import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
 import Slideshow from "yet-another-react-lightbox/plugins/slideshow";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
+import { placeHolderBlurImg } from '../../../../utils/default';
 
-import workImg1 from '../../../../public/works/img1.png'
-import workImg2 from '../../../../public/works/img2.png'
-import workImg3 from '../../../../public/works/img3.png'
-import workImg4 from '../../../../public/works/img4.png'
+// const images = [workImg1, workImg2, workImg3, workImg4, workImg1, workImg2, workImg3, workImg4];
 
-const images = [workImg1, workImg2, workImg3, workImg4, workImg1, workImg2, workImg3, workImg4];
-
-function NextJsImage({ slide, offset }: { slide: SlideImage; offset: number }) {
+export function NextJsImage({ slide, offset }: { slide: SlideImage; offset: number }) {
     const {
         on: { click },
         carousel: { imageFit },
@@ -43,7 +39,8 @@ function NextJsImage({ slide, offset }: { slide: SlideImage; offset: number }) {
                 src={img}
                 loading="eager"
                 draggable={false}
-                placeholder={img.blurDataURL ? "blur" : undefined}
+                placeholder={'blur'}
+                blurDataURL={placeHolderBlurImg}
                 style={{
                     objectFit: cover ? "cover" : "contain",
                     height: "100%",
@@ -59,7 +56,7 @@ function NextJsImage({ slide, offset }: { slide: SlideImage; offset: number }) {
 }
 
 
-const ServiceImages = () => {
+const ServiceImages = ({ images }: { images: string[] }) => {
     const [open, setOpen] = useState(false)
     return (
         <div>
@@ -71,6 +68,7 @@ const ServiceImages = () => {
                             src={img}
                             alt={`Any job Work sample`}
                             placeholder='blur'
+                            blurDataURL={placeHolderBlurImg}
                             width={2000}
                             height={2000}
                             className="w-full h-full object-cover rounded-md"
@@ -89,7 +87,7 @@ const ServiceImages = () => {
             <Lightbox
                 open={open}
                 close={() => setOpen(false)}
-                slides={images}
+                slides={images?.map(img => { return { src: img, height : 1000, width : 1000 } })}
                 render={{ slide: NextJsImage }}
                 plugins={[Fullscreen, Slideshow, Zoom]}
             />

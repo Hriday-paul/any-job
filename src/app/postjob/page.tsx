@@ -2,7 +2,7 @@ import React from 'react';
 import bannerImg from '../../../public/Subtract.png'
 
 import Image from 'next/image';
-import AddForm from '@/components/Pages/PostJob/AddForm';
+import AddForm from '@/components/Pages/PostJob/PostJobForm';
 
 const page = () => {
     return (

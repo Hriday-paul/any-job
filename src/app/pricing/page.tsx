@@ -1,43 +1,7 @@
-import PricingCard from '@/components/Shared/PricingCard';
+
+import Pricing from '@/components/Pages/Pricing/Pricing';
 import React from 'react';
 
-export type packageType = {
-    id: number,
-    title: string,
-    details: string,
-    duration: string,
-    price: number,
-    offers: string[]
-}
-
-const Price: packageType[] = [
-    {
-        id: 1,
-        title: "Basic Plan",
-        details: "Limited Quotes (Monthly)",
-        duration: "mo",
-        price: 29.99,
-        offers: [
-            "Perfect for new contractors testing the platform",
-            "Access up to 5 quotes per month",
-            "Pay-as-you-go flexibility",
-            "Ideal for part-time service providers",
-        ]
-    },
-    {
-        id: 2,
-        title: "Pro Plan",
-        details: "Unlimited Quotes (Yearly)",
-        duration: "yr",
-        price: 299.99,
-        offers: [
-            "Perfect for new contractors testing the platform",
-            "Access up to 5 quotes per month",
-            "Pay-as-you-go flexibility",
-            "Ideal for part-time service providers",
-        ]
-    }
-]
 
 const page = () => {
     return (
@@ -65,13 +29,7 @@ const page = () => {
             </div>
 
             <div className='container'>
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-5 items-center max-w-4xl mx-auto -mt-24 mb-10'>
-                    {
-                        Price?.map(item => {
-                            return <PricingCard packag={item} key={item?.id} />
-                        })
-                    }
-                </div>
+                <Pricing />
             </div>
 
         </div>

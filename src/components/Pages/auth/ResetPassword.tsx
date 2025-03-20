@@ -6,6 +6,8 @@ import React from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { ImSpinner2 } from 'react-icons/im';
 import { motion } from "motion/react"
+import { useResetPasswordMutation } from '@/redux/api/authApi';
+import { toast } from 'sonner';
 
 type resetPasswordType = {
     new_password: string,
@@ -13,21 +15,44 @@ type resetPasswordType = {
 }
 
 const ResetPassword = () => {
-    const pathName = usePathname();
+    const [postResetPassword, { isLoading }] = useResetPasswordMutation();
+
     const {
         register,
         handleSubmit,
+        reset,
+        watch,
         formState: { errors },
     } = useForm<resetPasswordType>();
 
     const router = useRouter();
 
     const handleFormSubmit: SubmitHandler<resetPasswordType> = async (data) => {
-        console.log(data)
-        router.push('/signin')
+        if (data?.new_password !== data?.confirm_password) return;
+        try {
+            const res = await postResetPassword({ password: data?.new_password }).unwrap();
+
+            toast.success(res?.message || 'Password reset successfully');
+            reset();
+
+            // dispatch(addUserDetails({
+            //     name: res?.data?.user?.name,
+            //     email: res?.data?.user?.email,
+            //     address: res?.data?.user?.address || '',
+            //     gender: res?.data?.user?.gender || '',
+            //     phoneNumber: res?.data?.user?.phoneNumber || '',
+            //     image: res?.data?.user?.image || '',
+            //     role: res?.data?.user?.role,
+            // }))
+
+            router.push('/signin')
+
+        } catch (err: any) {
+            toast.error(err?.data?.message || 'Something went wrong, try again');
+        }
+
     }
 
-    const isLoading = false;
     return (
         <div>
             <div className='bg-white max-w-xl rounded-xl shadow-md p-8 mx-auto'>
@@ -75,6 +100,8 @@ const ResetPassword = () => {
                                 },
                             }}
                         />
+
+                        {(watch('new_password') !== watch('confirm_password')) && <p className='text-xs font-figtree text-danger mt-0.5'>Password not match</p>}
 
                     </div>
 

@@ -1,8 +1,8 @@
 "use client"
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { counties, job_prefered_days, services, times } from '../../../../utils/default';
+import { job_prefered_days, times } from '../../../../utils/default';
 import { Calendar } from "@/components/ui/calendar"
 import {
     Popover,
@@ -21,36 +21,56 @@ import jobDetailsIcon from '../../../../public/job_details_icon.png'
 import { ImSpinner2 } from "react-icons/im";
 import Swal from 'sweetalert2'
 import SelectJobLocation from '@/components/Shared/SelectJobLocation';
+import { useServicesQuery } from '@/redux/api/serviceApi';
+import { toast } from 'sonner';
+import { useGetAddreessByGoogleQuery, usePostJobMutation } from '@/redux/api/jobsApi';
+import { useSearchParams } from 'next/navigation';
 
 export type postJobType = {
+    title: string,
     description: string,
     service: string,
-    county: string,
-    town: string,
-    preferd_day: string
-    job_date: Date,
+    address: string,
+    // county: string,
+    // town: string,
+    dates: string
+    preferredJobDate: Date,
     time: string,
     budget: number,
-    instruction: string,
-    first_name: string,
-    last_name: string,
+    specialInstructions: string,
+    firstName: string,
+    lastName: string,
     email: string,
-    phone: string
+    phoneNumber: string
 }
 
 const AddForm = () => {
+
+    const { isLoading: serviceLoading, data: services, isSuccess } = useServicesQuery({});
+
+    const [postJob, { isLoading }] = usePostJobMutation();
+
+    const defaultService = useSearchParams().get('service');
+
+    const [coordinates, setCoordinates] = useState<{ lat: number, lng: number }>({ lat: 53.3498, lng: -6.2603 })
+
+    const { isSuccess: addressSuccess, data: address } = useGetAddreessByGoogleQuery(coordinates);
+
+
     const [images, setImages] = useState<File[]>([]);
-    const [coordinates, setCoordinates] = useState<{ lat: number, lng: number } | null>(null)
+
     const {
         register,
         handleSubmit,
         control,
+        reset,
         watch,
         formState: { errors },
     } = useForm<postJobType>({
         defaultValues: {
-            job_date: new Date(),
-            preferd_day: "Flexible"
+            preferredJobDate: new Date(),
+            dates: "Flexible",
+            service: defaultService || ''
         }
     });
 
@@ -69,28 +89,91 @@ const AddForm = () => {
         setImages(finalImgs)
     }, [images])
 
-    const isLoading = false
-
     const handleFormSubmit: SubmitHandler<postJobType> = async (data) => {
-        console.log(data)
+        console.log(data?.dates)
+        if (!coordinates) {
+            toast.error("Please, select your job location.")
+            return;
+        }
+        try {
 
-        Swal.fire({
-            title: "Your job has been posted successfully!",
-            text: "Contractors in your area will review your job and send quotes. You’ll be notified when a quote arrives.",
-            customClass: {
-                title: "text-2xl text-black font-figtree",
-                container: "text-sm font-medium font-figtree text-zinc-800",
-                cancelButton: "bg-primary_red text-white",
-                confirmButton: "bg-primary_red text-white"
-            },
-            icon: 'success',
-            showCancelButton: true,
-            showConfirmButton: false,
-            confirmButtonText: "Close",
-            confirmButtonColor: "#38CB6E",
-            cancelButtonText: "Cancel",
-        })
+            const form = new FormData();
+
+            form.append("data", JSON.stringify({ ...data, dates: [data?.dates], latitude: coordinates?.lat, longitude: coordinates?.lng }));
+
+            images?.forEach(img => {
+                form.append("additionalDetails", img)
+            })
+
+            const res = await postJob(form).unwrap();
+
+            if (res?.success) {
+                Swal.fire({
+                    title: "Your job has been posted successfully!",
+                    text: "Contractors in your area will review your job and send quotes. You’ll be notified when a quote arrives.",
+                    customClass: {
+                        title: "text-2xl text-black font-figtree",
+                        container: "text-sm font-medium font-figtree text-zinc-800",
+                        cancelButton: "bg-primary_red text-white",
+                        confirmButton: "bg-primary_red text-white"
+                    },
+                    icon: 'success',
+                    showCancelButton: true,
+                    showConfirmButton: false,
+                    confirmButtonText: "Close",
+                    confirmButtonColor: "#38CB6E",
+                    cancelButtonText: "Close",
+                })
+
+                reset();
+            }
+
+        } catch (err: any) {
+            toast.error(err?.data?.message || "Something went wrong")
+        }
     }
+
+    useEffect(() => {
+        if (addressSuccess) {
+
+            let newAddress = null;
+
+            // Loop through results to find an address that is not a Plus Code
+            for (const result of address.results) {
+                if (!result.plus_code) {
+                    newAddress = result.formatted_address;
+                    break;
+                }
+            }
+
+            // Fallback to first result if no valid address found
+            if (!newAddress) {
+                newAddress = address?.results[0].formatted_address;
+            }
+
+            reset({ address: newAddress })
+        }
+    }, [addressSuccess, address])
+
+    // -----------------set default geolocation----------------
+    useEffect(() => {
+        if (!navigator.geolocation) {
+            console.log("geolocation is not support")
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                setCoordinates({
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                });
+            },
+            (err) => {
+                console.log(err?.message)
+            }
+        );
+    }, []);
 
     return (
         <div className='bg-[#fff9f9] p-5 md:p-8 max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] relative -mt-10 md:-mt-24 lg:-mt-32 z-20 mb-20 rounded-xl'>
@@ -103,6 +186,22 @@ const AddForm = () => {
             </div>
 
             <form onSubmit={handleSubmit(handleFormSubmit)} className=''>
+
+                {/* ------------------title---------------- */}
+                <div className="w-full mx-auto mb-3">
+                    <label htmlFor='title' className="mb-1.5 block text-black dark:text-white font-figtree">
+                        Title
+                        <span className="text-red-500 text-base ml-1">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        id='title'
+                        {...register("title", { required: true })}
+                        placeholder="Title"
+                        className={`w-full rounded-md bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] border-[1.5px] bg-transparent py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-poppins ${errors?.title ? 'border-danger' : 'dark:text-white border-strokeinput focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
+                    />
+                    {errors?.title && <p className="text-red-500 text-sm col-span-2">{errors?.title?.message}</p>}
+                </div>
 
                 {/* ----------details-------------- */}
                 <div className="w-full mx-auto mb-3">
@@ -138,13 +237,13 @@ const AddForm = () => {
                                 defaultValue={field.value}
                             >
                                 <SelectTrigger className={`bg-form px-4 py-3 rounded-md  text-sm font-figtree w-full text-primary bg-secondary border shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] ${errors?.service ? "font-medium  border-danger" : "border-strokeinput"}`}>
-                                    <SelectValue placeholder={"Service"} />
+                                    <SelectValue placeholder={serviceLoading ? "Loading..." : "Service"} />
                                 </SelectTrigger>
                                 <SelectContent className="rounded-sm text-sm font-figtree bg-form">
                                     {
-                                        services?.map(item => {
-                                            return <SelectItem key={item} value={item} className="h-10 font-figtree text-base font-medium hover:!bg-white">{item}</SelectItem>
-                                        })
+                                        isSuccess ? services?.data?.map(item => {
+                                            return <SelectItem key={item?.id} value={item?.name} className="h-10 font-figtree text-base font-medium hover:!bg-white">{item?.name}</SelectItem>
+                                        }) : <></>
                                     }
                                 </SelectContent>
                             </Select>
@@ -154,19 +253,34 @@ const AddForm = () => {
                     {errors?.service && <p className="text-red-500 text-sm col-span-2">{errors?.service?.message}</p>}
                 </div>
 
-
                 {/* ---------select job location------------ */}
                 <div className="w-full mx-auto mb-5 mt-5">
                     <label htmlFor='loc' className="mb-1.5 block text-black dark:text-white font-figtree">
-                        Select Job Location
+                        Mark Job Location for get message contractors in your area
                         <span className="text-red-500 text-base ml-1">*</span>
                     </label>
                     <SelectJobLocation coordinates={coordinates} setCoordinates={setCoordinates} height='300px' />
                 </div>
 
+                {/* ---------select address------------ */}
+                <div className="w-full mx-auto mb-3">
+                    <label htmlFor='Address' className="mb-1.5 block text-black dark:text-white font-figtree">
+                        Address
+                        <span className="text-red-500 text-base ml-1">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        id='Address'
+                        {...register("address", { required: true })}
+                        placeholder="city, state, country"
+                        className={`w-full rounded-md bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] border-[1.5px] bg-transparent py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-poppins ${errors?.address ? 'border-danger' : 'dark:text-white border-strokeinput focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
+                    />
+                    {errors?.address && <p className="text-red-500 text-sm col-span-2">{errors?.address?.message}</p>}
+                </div>
+
 
                 {/* ------------------------county------------------ */}
-                <div className="w-full mx-auto mb-3">
+                {/* <div className="w-full mx-auto mb-3">
                     <label htmlFor='brand' className="mb-1.5 block text-black dark:text-white font-figtree">
                         County
                         <span className="text-red-500 text-base ml-1">*</span>
@@ -197,10 +311,10 @@ const AddForm = () => {
 
                     </Controller>
                     {errors?.county && <p className="text-red-500 text-sm col-span-2">{errors?.county?.message}</p>}
-                </div>
+                </div> */}
 
                 {/* ---------town------------ */}
-                <div className="w-full mx-auto mb-3">
+                {/* <div className="w-full mx-auto mb-3">
                     <label htmlFor='town' className="mb-1.5 block text-black dark:text-white font-figtree">
                         Town/City
                         <span className="text-red-500 text-base ml-1">*</span>
@@ -213,7 +327,7 @@ const AddForm = () => {
                         className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.town ? 'border-danger' : 'dark:text-white border-strokeinput focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
                     />
                     {errors?.town && <p className="text-red-500 text-sm col-span-2">{errors?.town?.message}</p>}
-                </div>
+                </div> */}
 
                 <div className='flex items-center gap-x-2 py-3 lg:py-4'>
                     <Image src={calander_icon} placeholder='blur' className='w-auto h-5 lg:h-7 object-cover' alt="any job details icon" />
@@ -228,7 +342,7 @@ const AddForm = () => {
                     </label>
                     <div className=' bg-form pt-1.5 pb-4 px-2 rounded-lg shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] '>
                         <Controller
-                            name={'preferd_day'}
+                            name={'dates'}
                             control={control}
                             rules={{
                                 required: true,
@@ -239,7 +353,7 @@ const AddForm = () => {
                                         job_prefered_days?.map((item, indx) => {
                                             return <div key={indx} className="inline-flex items-center mt-2">
                                                 <label className="flex items-center cursor-pointer relative" htmlFor={item}>
-                                                    <input type="radio" onChange={field?.onChange} name='job_prefered' className="peer h-4 w-4 cursor-pointer transition-all appearance-none rounded-sm border border-stroke checked:border-stroke" id={item} defaultChecked={item == watch('preferd_day')} />
+                                                    <input type="radio" onChange={field?.onChange} value={item} name='job_prefered' className="peer h-4 w-4 cursor-pointer transition-all appearance-none rounded-sm border border-stroke checked:border-stroke" id={item} />
                                                     <span className="absolute text-primary opacity-0 pointer-events-none peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" stroke="currentColor" strokeWidth="1">
                                                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path>
@@ -266,7 +380,7 @@ const AddForm = () => {
                         <span className="text-red-500 text-base ml-1">*</span>
                     </label>
                     <Controller
-                        name={'job_date'}
+                        name={'preferredJobDate'}
                         defaultValue={new Date()}
                         control={control}
                         rules={{
@@ -275,15 +389,15 @@ const AddForm = () => {
                         render={({ field }) => (
                             <Popover>
                                 <PopoverTrigger asChild>
-                                    <button className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree text-left ${errors?.job_date ? 'border-danger' : 'dark:text-white border-strokeinput focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'} text-zinc-500 flex flex-row gap-x-2 items-center`}>
+                                    <button className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree text-left ${errors?.preferredJobDate ? 'border-danger' : 'dark:text-white border-strokeinput focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'} text-zinc-500 flex flex-row gap-x-2 items-center`}>
                                         <CalendarIcon className='h-5 w-5' />
-                                        {watch("job_date") ? format(watch("job_date"), "PPP") : "YYYY/MM/DD"}
+                                        {watch("preferredJobDate") ? format(watch("preferredJobDate"), "PPP") : "YYYY/MM/DD"}
                                     </button>
                                 </PopoverTrigger>
                                 <PopoverContent className="p-0">
                                     <Calendar
                                         mode="single"
-                                        selected={watch("job_date")}
+                                        selected={watch("preferredJobDate")}
                                         onSelect={field?.onChange}
                                         initialFocus
                                         className='bg-form'
@@ -293,20 +407,20 @@ const AddForm = () => {
                         )} >
 
                     </Controller>
-                    {errors?.job_date && <p className="text-red-500 text-sm col-span-2">{errors?.job_date?.message}</p>}
+                    {errors?.preferredJobDate && <p className="text-red-500 text-sm col-span-2">{errors?.preferredJobDate?.message}</p>}
                 </div>
 
                 {/* ------------------------time------------------ */}
                 <div className="w-full mx-auto mb-3">
                     <label htmlFor='brand' className="mb-1.5 block text-black dark:text-white font-figtree">
                         Time Preference
-                        <span className="text-red-500 text-base ml-1">*</span>
+                        {/* <span className="text-red-500 text-base ml-1">*</span> */}
                     </label>
                     <Controller
                         name={'time'}
                         control={control}
                         rules={{
-                            required: true,
+                            // required: true,
                         }}
                         render={({ field }) => (
                             <Select
@@ -319,15 +433,16 @@ const AddForm = () => {
                                 <SelectContent className="rounded-sm text-sm font-figtree bg-form">
                                     {
                                         times?.map(item => {
-                                            return <SelectItem key={item} value={item} className="h-10 font-figtree text-base font-medium hover:!bg-white">{item}:00</SelectItem>
+                                            return <SelectItem key={item} value={item} className="h-10 font-figtree text-base font-medium hover:!bg-white">{item}</SelectItem>
                                         })
                                     }
                                 </SelectContent>
+
                             </Select>
                         )} >
 
                     </Controller>
-                    {errors?.county && <p className="text-red-500 text-sm col-span-2">{errors?.county?.message}</p>}
+                    {errors?.time && <p className="text-red-500 text-sm col-span-2">{errors?.time?.message}</p>}
                 </div>
 
                 <div className='flex items-center gap-x-2 py-3 lg:py-4'>
@@ -378,7 +493,7 @@ const AddForm = () => {
                                     <div className='relative w-14 h-14'>
                                         <Image src={URL.createObjectURL(img)} fill className='h-full w-full object-cover rounded-md' alt='any job atachment' />
                                     </div>
-                                    <button onClick={() => removeImg(indx)} className='border border-stroke bg-zinc-200 rounded p-1 mr-2'>
+                                    <button type='button' onClick={() => removeImg(indx)} className='border border-stroke bg-zinc-200 rounded p-1 mr-2'>
                                         <MdDeleteOutline className='text-lg text-danger' />
                                     </button>
                                 </div>
@@ -395,12 +510,12 @@ const AddForm = () => {
                     </label>
                     <textarea
                         id='Special Instructions:'
-                        {...register("instruction")}
+                        {...register("specialInstructions")}
                         placeholder="Any special instructions you want to provide....."
                         rows={4}
-                        className={`w-full bg-form rounded-md border-[1.5px] bg-transparent py-3 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] ${errors?.instruction ? 'border-danger' : 'dark:text-white border-strokeinput focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
+                        className={`w-full bg-form rounded-md border-[1.5px] bg-transparent py-3 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] ${errors?.specialInstructions ? 'border-danger' : 'dark:text-white border-strokeinput focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
                     />
-                    {errors?.instruction && <p className="text-red-500 text-sm col-span-2">{errors?.instruction?.message}</p>}
+                    {errors?.specialInstructions && <p className="text-red-500 text-sm col-span-2">{errors?.specialInstructions?.message}</p>}
                 </div>
 
 
@@ -421,11 +536,11 @@ const AddForm = () => {
                             <input
                                 type="text"
                                 id='fname'
-                                {...register("first_name", { required: true, minLength: { value: 3, message: "first name minimum 2 character" } })}
+                                {...register("firstName", { required: true, minLength: { value: 3, message: "first name minimum 2 character" } })}
                                 placeholder="First name"
-                                className={`w-full rounded-md bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] border-[1.5px] bg-transparent py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-poppins ${errors?.first_name ? 'border-danger' : 'dark:text-white border-strokeinput focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
+                                className={`w-full rounded-md bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] border-[1.5px] bg-transparent py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-poppins ${errors?.firstName ? 'border-danger' : 'dark:text-white border-strokeinput focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
                             />
-                            {errors?.first_name && <p className="text-red-500 text-sm col-span-2">{errors?.first_name?.message}</p>}
+                            {errors?.firstName && <p className="text-red-500 text-sm col-span-2">{errors?.firstName?.message}</p>}
                         </div>
                         <div className="w-full lg:w-1/2 mx-auto">
                             <label htmlFor='lastname' className="mb-1.5 block text-black dark:text-white font-figtree">
@@ -434,13 +549,12 @@ const AddForm = () => {
                             <input
                                 type="text"
                                 id='lastname'
-                                {...register("last_name")}
+                                {...register("lastName")}
                                 placeholder="Last name"
-                                className={`w-full rounded-md bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] border-[1.5px] bg-transparent py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-poppins ${errors?.last_name ? 'border-danger' : 'dark:text-white border-strokeinput focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
+                                className={`w-full rounded-md bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] border-[1.5px] bg-transparent py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-poppins ${errors?.lastName ? 'border-danger' : 'dark:text-white border-strokeinput focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
                             />
-                            {errors?.last_name && <p className="text-red-500 text-sm col-span-2">{errors?.last_name?.message}</p>}
+                            {errors?.lastName && <p className="text-red-500 text-sm col-span-2">{errors?.lastName?.message}</p>}
                         </div>
-
                     </div>
                     <div className="w-full mx-auto my-5">
                         <label htmlFor='email' className="mb-1.5 block text-black dark:text-white font-figtree">
@@ -468,20 +582,20 @@ const AddForm = () => {
                         <input
                             type="number"
                             id='phone'
-                            {...register("phone", {
+                            {...register("phoneNumber", {
                                 required: true, pattern: {
                                     value: /(?=.*?[0-9])/, message: 'phone number invalid'
                                 }
                             })}
                             placeholder="Phone"
-                            className={`w-full rounded-md bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] border bg-transparent py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-poppins ${errors?.phone ? 'border-danger' : 'dark:text-white border-strokeinput focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
+                            className={`w-full rounded-md bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] border bg-transparent py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-poppins ${errors?.phoneNumber ? 'border-danger' : 'dark:text-white border-strokeinput focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
                         />
-                        {errors?.phone && <p className="text-red-500 text-sm col-span-2">{errors?.phone?.message}</p>}
+                        {errors?.phoneNumber && <p className="text-red-500 text-sm col-span-2">{errors?.phoneNumber?.message}</p>}
                     </div>
 
                     <button type='submit' disabled={isLoading} className='bg-primary_red py-3 font-figtree text-secondary rounded-lg w-full mt-5 hover:bg-opacity-90 duration-200 flex flex-row gap-x-2 items-center justify-center disabled:bg-opacity-60 text-white'>
-                        {isLoading && <ImSpinner2 className="text-lg text-white animate-spin" />}
-                        <span>{isLoading ? 'Loading...' : "Post Job & Get Quotes"}</span>
+                        {(isLoading) && <ImSpinner2 className="text-lg text-white animate-spin" />}
+                        <span>{(isLoading) ? 'Loading...' : "Post Job & Get Quotes"}</span>
                     </button>
 
 

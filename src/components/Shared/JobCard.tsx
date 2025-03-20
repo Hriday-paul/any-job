@@ -1,25 +1,38 @@
-import React from 'react';
-import userImg from '../../../public/quotes/user.jpeg'
-import serviceImg from '../../../public/works/img1.png'
-import Image from 'next/image';
+import React, { useState } from 'react';
 import SendQuote from '../Pages/Jobs/SendQuote';
+import { jobType } from '@/redux/types';
+import moment from 'moment'
 
-export default function JobCard() {
+import JobImagePreview from './JobImagePreview';
+
+export default function JobCard({ job }: { job: jobType }) {
+
+    const images = job?.jobAdditionalDetails;
+
     return (
         <div className=" bg-white rounded-xl shadow-lg">
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-4">
                 {/* Header with Avatar and Contact */}
                 <div>
-                    <h2 className="text-xl font-semibold font-figtree">John O'Conner</h2>
-                    <p className="text-gray-600 font-figtree">Phone Number: +353123456789</p>
+                    <h2 className="text-xl font-semibold font-figtree">{job?.title}</h2>
+                </div>
+
+                <div>
+                    <p className="text-gray-600 font-figtree">Name: {(job?.firstName + " " + job?.lastName) || "-----"}</p>
+                    {/* <p className="text-gray-600 font-figtree">Email: {job?.email || "-----"}</p>
+                    <p className="text-gray-600 font-figtree">Phone Number: {job?.phoneNumber || "-----"}</p> */}
+                </div>
+
+                <div>
+                    <span className="font-medium font-figtree">Service: </span>
+                    <span className="text-gray-600 font-figtree">{job?.service}</span>
                 </div>
 
                 {/* Job Description */}
                 <div>
                     <h3 className="font-medium mb-2 font-figtree">Job Description:</h3>
                     <p className="text-gray-600 font-figtree">
-                        Needs a professional plumber to fix a leaking pipe. The leak is under the kitchen sink and requires
-                        immediate attention. The contractor is expected to replace damaged parts if needed.
+                        {job?.description}
                     </p>
                 </div>
 
@@ -27,56 +40,46 @@ export default function JobCard() {
                 <div className="space-y-2">
                     <div>
                         <span className="font-medium font-figtree">Location: </span>
-                        <span className="text-gray-600 font-figtree">Dublin, Ireland</span>
+                        <span className="text-gray-600 font-figtree">{job?.address}</span>
                     </div>
-                    <div>
+                    {/* <div>
                         <span className="font-medium font-figtree">Town: </span>
                         <span className="text-gray-600 font-figtree">Swords</span>
-                    </div>
+                    </div> */}
                     <div>
-                        <span className="font-medium font-figtree">Availability: </span>
-                        <span className="text-gray-600 font-figtree">Feb 10, 2025 - 10 AM</span>
+                        <span className="font-medium font-figtree">Preferred Schedule: </span>
+                        <span className="text-gray-600 font-figtree">{moment(job?.preferredJobDate).format('MMMM Do YYYY')} {job?.dates && (job?.dates)} - {job?.time || "flexible time"}</span>
                     </div>
+                    {job?.budget && <div>
+                        <span className="font-medium font-figtree">Budget: </span>
+                        <span className="text-gray-800 font-figtree font-semibold">{job?.budget}$</span>
+                    </div>}
                 </div>
 
                 {/* Photos */}
                 <div>
                     <h3 className="font-medium mb-3 font-figtree">Photos:</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                        <Image
-                            src={serviceImg}
-                            height={1500}
-                            width={1500}
-                            alt="Job site photo 1"
-                            className="w-full h-32 object-cover rounded-lg"
-                        />
-                        <Image
-                            height={1500}
-                            width={1500}
-                            src={serviceImg}
-                            alt="Job site photo 2"
-                            className="w-full h-32 object-cover rounded-lg"
-                        />
-                    </div>
+
+                    <JobImagePreview images={images || []} />
+
                 </div>
 
                 {/* Special Instructions */}
                 <div>
                     <h3 className="font-medium mb-2 font-figtree">Special Instruction:</h3>
                     <p className="text-gray-600 font-figtree">
-                        Needs a professional plumber to fix a leaking pipe. The leak is under the kitchen sink and requires
-                        immediate attention. The contractor is expected to replace damaged parts if needed.
+                        {job?.specialInstructions}
                     </p>
                 </div>
 
                 {/* Availability Buttons */}
-                <div className="grid grid-cols-2 gap-4">
-                    <SendQuote clicker={<button className="w-full py-2 bg-primary_red text-white rounded-md hover:bg-primary_red transition-colors font-figtree">
+                <div className="grid grid-cols-1 gap-4">
+                    <SendQuote id={job?.id} clicker={<button className="w-full py-2 bg-primary_red text-white rounded-md hover:bg-primary_red transition-colors font-figtree">
                         Available
                     </button>}></SendQuote>
-                    <button className="w-full py-2 bg-white border border-primary_red text-primary_red rounded-md hover:bg-primary_red hover:text-white transition-colors">
+                    {/* <button className="w-full py-2 bg-white border border-primary_red text-primary_red rounded-md hover:bg-primary_red hover:text-white transition-colors">
                         Not Available
-                    </button>
+                    </button> */}
                 </div>
             </div>
         </div>

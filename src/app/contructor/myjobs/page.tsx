@@ -1,14 +1,10 @@
-import MyJobsFilter from '@/components/Pages/MyJobs/MyJobsFilter';
-import MyJobTable from '@/components/Pages/MyJobs/MyJobTable';
+import MyJobsRoot from '@/components/Pages/MyJobs/MyJobsRoot';
 import React from 'react';
 
 const page = () => {
     return (
         <div className='container'>
-            <div>
-                <MyJobsFilter />
-                <MyJobTable />
-            </div>
+            <MyJobsRoot />
         </div>
     );
 };

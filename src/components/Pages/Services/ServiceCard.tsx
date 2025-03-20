@@ -1,42 +1,49 @@
-import { Star } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
+import { servicesType } from '@/redux/types';
+import { placeHolderBlurImg } from '../../../../utils/default';
 import { HiArrowUpRight } from 'react-icons/hi2';
 
-import serviceImg1 from "../../../../public/works/img1.png"
-import userImg from "../../../../public/quotes/user.jpeg"
-
-const ContractorCard = () => {
+const ServiceCard = ({ service }: { service: servicesType }) => {
     return (
         <div className='shadow-md bg-white rounded-lg p-5 group'>
-            <Link href='/profile/32' className="">
+            <Link href={`/services/${service?.id}`} className="">
                 <Image
-                    src={serviceImg1}
+                    src={service?.image || "/empty_work_image.jpeg"}
                     placeholder='blur'
-                    alt="Dogs being walked"
+                    blurDataURL={placeHolderBlurImg}
+                    alt="service Image"
                     width={2000}
                     height={2000}
-                    className="w-full h-48 object-cover rounded-md"
+                    className="w-full h-52 object-cover rounded-md"
                 />
             </Link>
             <div className="space-y-4">
-                <div className="space-y-2.5">
-                    <h2 className="text-base font-medium text-gray-900 line-clamp-2 font-figtree pt-2">
-                        <Link href='/profile/34'>
-                            {"Hi, I'm John O'Conner, a dedicated home service contractor with over a decade of experience in maintaining residential properties and electrical services. My goal is to ensure that every home receives the highest standard of care."}
+                <div>
+                    <Link href={`/services/${service?.id}`} className='flex justify-between items-center bg-red-50 py-2 px-4 mt-4 rounded-md'>
+                        <h3 className='text-xl font-figtree font-semibold text-primary_red'>{service?.name}</h3>
+
+                        <div className='text-primary_red font-figtree flex flex-row gap-x-3 items-center justify-center'>
+                            <HiArrowUpRight className='text-xl rotate-45 mt-0.5 group-hover:rotate-0 duration-300' />
+                            <span className='-ml-[37px] h-8 w-8 bg-[#ffe3e5] rounded-full mt-0.5'></span>
+                        </div>
+                    </Link>
+                    {/* <article className="text-base font-medium text-gray-900 line-clamp-4 font-figtree">
+                        <Link href={`/services/${service?.id}`}>
+                            {service?.description}
                         </Link>
-                    </h2>
-                    <div className="flex gap-2">
+                    </article> */}
+                    {/* <div className="flex gap-2">
                         {["Cleaning", "Repairing"].map((service) => (
                             <span key={service} className="px-2 py-1 text-sm font-figtree font-medium bg-red-50 text-primary_red rounded-full">
                                 {service}
                             </span>
                         ))}
-                    </div>
+                    </div> */}
                 </div>
 
-                <div className="flex items-center justify-between">
+                {/* <div className="flex items-center justify-between">
 
                     <Link href='/profile/32'>
                         <div className="flex items-center gap-3">
@@ -51,17 +58,15 @@ const ContractorCard = () => {
                             </div>
                         </div>
                     </Link>
+                     */}
 
-                    <Link href={'/profile/32'} className='text-primary_red font-figtree flex flex-row gap-x-3 items-center justify-center'>
-                        <HiArrowUpRight className='text-xl rotate-45 mt-0.5 group-hover:rotate-0 duration-300' />
-                        <span className='-ml-[37px] h-8 w-8 bg-[#ffe3e5] rounded-full mt-0.5'></span>
-                    </Link>
-                </div>
+
+                {/* </div> */}
 
 
             </div>
-        </div>
+        </div >
     );
 };
 
-export default ContractorCard;
+export default ServiceCard;

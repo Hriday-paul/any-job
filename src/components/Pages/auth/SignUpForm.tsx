@@ -8,35 +8,76 @@ import { ImSpinner2 } from 'react-icons/im';
 import { motion } from "motion/react"
 import MultipleSelect from '@/components/Shared/MultiSelect';
 import { services } from '../../../../utils/default';
+import { useRegisterUserMutation } from '@/redux/api/authApi';
+import { useCookies } from 'react-cookie';
+import { toast } from 'sonner';
+import { config } from '../../../../utils/config';
+import { useServicesQuery } from '@/redux/api/serviceApi';
 
 type signUpType = {
     firstName: string,
     lastName: string,
     email: string,
-    service: string[]
+    userServices: string[]
     password: string,
     confirmPassword: string,
     terms: boolean
 }
 
 const SignUpForm = () => {
+    const { isLoading: serviceLoading, data: services, isSuccess } = useServicesQuery({})
+    const [postUser, { isLoading }] = useRegisterUserMutation();
+    const [_, setCookie] = useCookies(['token', 'accessToken', 'refreshToken']);
+
     const pathName = usePathname();
     const {
         register,
         handleSubmit,
         control,
         watch,
+        reset,
         formState: { errors },
     } = useForm<signUpType>();
 
     const router = useRouter();
 
     const handleFormSubmit: SubmitHandler<signUpType> = async (data) => {
-        console.log(data)
-        router.push('/location')
-    }
+        try {
 
-    const isLoading = false;
+            if (data?.password !== data?.confirmPassword) return;
+
+            const newData = {
+                firstName: data?.firstName,
+                lastName: data?.lastName,
+                email: data?.email,
+                userServices: data?.userServices,
+                password: data?.password
+            }
+
+            const form = new FormData();
+
+            form.append("data", JSON.stringify(newData))
+
+            const res = await postUser({ formData: form }).unwrap();
+
+            setCookie('token', res?.data?.token, {
+                httpOnly: config.hasSSL,
+                // maxAge: (24 * (60 * 60)) * 30, // 30 days
+                path: '/',
+                sameSite: 'lax',
+                secure: config.env === 'production',
+            });
+
+            reset()
+
+            toast.success(res?.message || 'Signup successfully');
+
+            router.push('/verify-otp?next=/location')
+
+        } catch (err: any) {
+            toast.error(err?.data?.message || 'Something went wrong, try again');
+        }
+    }
 
     return (
         <div>
@@ -118,10 +159,11 @@ const SignUpForm = () => {
                             <span className="text-red-500 text-base ml-1">*</span>
                         </label>
                         <MultipleSelect
-                            name='service'
-                            items={services?.map(ser => {
-                                return { label: ser, value: ser }
-                            })}
+                            name='userServices'
+                            items={isSuccess ? services?.data?.map(service => {
+                                return { label: service?.name, value: service?.name }
+                            }) : []}
+                            isLoading={serviceLoading}
                             control={control}
                             errors={errors}
                             placeholder='select service'
@@ -172,6 +214,8 @@ const SignUpForm = () => {
                                 },
                             }}
                         />
+
+                        {(watch('password') !== watch('confirmPassword')) && <p className='text-xs font-figtree text-danger mt-0.5'>Password not match</p>}
 
                     </div>
 

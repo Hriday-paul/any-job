@@ -6,6 +6,11 @@ import React from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { ImSpinner2 } from 'react-icons/im';
 import { motion } from "motion/react"
+import { useLoginUserMutation } from '@/redux/api/authApi';
+import { toast } from 'sonner';
+import { useCookies } from 'react-cookie';
+import { useDispatch } from 'react-redux';
+import { addUserDetails } from '@/redux/slices/userSlice';
 
 type signInType = {
     email: string,
@@ -13,20 +18,52 @@ type signInType = {
 }
 
 const SignInForm = () => {
+    const [postSignIn, { isLoading }] = useLoginUserMutation();
+    const [_, setCookie] = useCookies(['accessToken', 'refreshToken']);
     const pathName = usePathname();
+    const dispatch = useDispatch();
     const router = useRouter()
     const {
         register,
         handleSubmit,
+        reset,
         formState: { errors },
     } = useForm<signInType>();
 
     const handleFormSubmit: SubmitHandler<signInType> = async (data) => {
-        console.log(data)
-        router.push('/contructor')
-    }
+        try {
+            const res = await postSignIn(data).unwrap();
 
-    const isLoading = false;
+            toast.success(res?.message || 'Signin successfully');
+            reset();
+
+            setCookie('accessToken', res?.data?.accessToken, {
+                httpOnly: false,
+                maxAge: 14 * 24 * 60 * 60, // 14 days
+                path: '/',
+                sameSite: 'lax',
+                secure: process.env.production === 'production',
+            });
+            setCookie('refreshToken', res?.data?.refreshToken, {
+                httpOnly: false,
+                maxAge: 30 * 24 * 60 * 60, // 30 days
+                path: '/',
+                sameSite: 'lax',
+                secure: process.env.production === 'production',
+            });
+
+            dispatch(addUserDetails({
+                firstName: res?.data?.firstName,
+                profilePicture: res?.data?.profilePicture,
+            }))
+
+            router.push('/contructor')
+
+        } catch (err: any) {
+            toast.error(err?.data?.message || 'Something went wrong, try again');
+        }
+
+    }
 
     return (
         <div>
@@ -81,11 +118,6 @@ const SignInForm = () => {
                             errors={errors}
                             validationRules={{
                                 required: "Password is required",
-                                pattern: {
-                                    value: /^(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/,
-                                    message:
-                                        "Password must include 1 uppercase, 1 number, 1 special character, and 8+ characters.",
-                                },
                             }}
                         />
 

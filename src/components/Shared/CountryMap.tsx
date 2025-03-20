@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import { config } from "../../../utils/config";
 
-const mapKey = process.env.NEXT_PUBLIC_MAP_KEY!
+const mapKey = config.MAP_KEY!
 
-const CountryMap = ({ setSelectedCountry, height = '500px' }: { setSelectedCountry: React.Dispatch<React.SetStateAction<string | null>>, height ?: string }) => {
+const CountryMap = ({ setSelectedCountry, height = '500px' }: { setSelectedCountry: React.Dispatch<React.SetStateAction<string | null>>, height?: string }) => {
 
     const [map, setMap] = useState<google.maps.Map | null>(null);
     const [coordinates, setCoordinates] = useState<{ lat: number; lng: number } | null>(null);

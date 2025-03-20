@@ -1,53 +1,55 @@
 "use client"
 import Image from 'next/image';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import userImage from '../../../../public/quotes/user.jpeg'
 import { MdDeleteOutline, MdOutlineAddPhotoAlternate } from 'react-icons/md';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { counties, services } from '../../../../utils/default';
 import MultipleSelect from '@/components/Shared/MultiSelect';
 import userIcon from '../../../../public/user.png'
 import locationIcon from '../../../../public/location.png'
 import serviceIcon from '../../../../public/service.png'
 import coinIcon from '../../../../public/coin_frame.png'
 import workIcon from '../../../../public/work.png'
-import CountryMap from '@/components/Shared/CountryMap';
 import MapWithDrawing from '@/components/Shared/MapWithDrawing';
+import { useServicesQuery } from '@/redux/api/serviceApi';
+import { useGetUserProfileQuery, useUpdateProfileMutation } from '@/redux/api/authApi';
+import ErrorComponent from '@/components/Shared/ErrorComponent';
+import { ImSpinner2, ImSpinner8 } from 'react-icons/im';
+import { toast } from 'sonner';
+import Link from 'next/link';
+import FilesManager from './FilesManager';
 
 export type editProfileType = {
     firstName: string,
     lastName: string,
-    phone: string;
-    email: string,
-    experience: number,
+    phoneNumber: string;
+    address: string,
+    experience: string,
     bio: string,
-    why_choose: string;
-    county: string,
-    town: string;
-    service: string,
-    price: number,
-    availability: string
+    whyChooseMe: string;
+    // county: string,
+    // town: string;
+    userServices: string[],
+    minPricing: string,
+    availability: string,
+    location?: { latitude: number, longitude: number }[][]
 }
 
 const EditProfileForm = () => {
-
+    const { isLoading, isSuccess, isError, data } = useGetUserProfileQuery()
+    const { isLoading: serviceLoading, data: services, isSuccess: serviceSuccess } = useServicesQuery({});
+    const [postUpdate, { isLoading: updateLoading }] = useUpdateProfileMutation();
     const [servicePhotos, setServicePhotos] = useState<File[]>([]);
     const [profileImg, setProfileImg] = useState<File | null>(null);
-    const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
-
-    const removeImg = useCallback((indxParam: number) => {
-        const finalImgs = servicePhotos?.filter((i, indx) => {
-            return indx !== indxParam
-        })
-        setServicePhotos(finalImgs)
-    }, [servicePhotos])
+    const [selectedArea, setSelectedArea] = useState<{ latitude: number, longitude: number }[][]>([]);
+    const [defaultSelectedArea, setDefaultSelectedArea] = useState<{ latitude: number, longitude: number }[][]>([]);
 
     const {
         register,
         handleSubmit,
         control,
-        watch,
+        reset,
         formState: { errors },
     } = useForm<editProfileType>();
 
@@ -67,107 +69,197 @@ const EditProfileForm = () => {
         setServicePhotos(prev => [...prev, ...fileList])
     };
 
-    const handleFormSubmit: SubmitHandler<editProfileType> = async (data) => {
-        console.log(data)
+    const handleFormSubmit: SubmitHandler<editProfileType> = async (fData) => {
+
+        if (fData?.userServices?.length <= 0) {
+            return;
+        }
+
+        const defaultServices = new Set(data?.data?.myServices?.map(item => {
+            return item?.service?.name
+        }));
+
+        const finalServices: { isDelete: boolean, name?: string, id?: string }[] = [
+
+            // -----------if not exist in default services-------------
+            ...fData?.userServices?.filter(serv => !defaultServices?.has(serv))?.map(item => { return { isDelete: false, name: item } }),
+
+            // ---------------if removed on default services-----------------
+            ...data?.data?.myServices?.filter(dfserv => !fData?.userServices?.includes(dfserv?.service?.name))?.map(item => { return { isDelete: true, id: item?.service?.id } }) ?? []
+        ]
+
+        // --------------set locations path if select a new Area--------------
+        if (selectedArea?.length > 0) {
+            fData.location = [
+                ...selectedArea,
+                ...(defaultSelectedArea?.length > 0 ? defaultSelectedArea : [])
+            ];
+        }
+
+        try {
+            const form = new FormData();
+
+            form.append("data", JSON.stringify({ ...fData, userServices: finalServices }))
+
+            if (profileImg) {
+                form.append('profilePicture', profileImg)
+            }
+
+            servicePhotos.forEach((image) => {
+                form.append('workPhotos', image);
+            });
+
+            const res = await postUpdate({ data: form }).unwrap();
+
+            setServicePhotos([]);
+            toast.success(res?.message || 'Profile update successfully');
+
+        } catch (err: any) {
+            toast.error(err?.data?.message || 'Something went wrong, try again');
+        }
     }
 
+    useEffect(() => {
+        if (isSuccess) {
+            reset({
+                firstName: data?.data?.firstName,
+                lastName: data?.data?.lastName || '',
+                phoneNumber: data?.data?.phoneNumber || '',
+                address: data?.data?.address || '',
+                experience: data?.data?.experience || "",
+                bio: data?.data?.bio || '',
+                whyChooseMe: data?.data?.whyChooseMe || '',
+                availability: data?.data?.availability || '',
+                minPricing: data?.data?.minPricing?.toString() || '',
+                userServices: data?.data?.myServices?.map(s => s?.service?.name) || [],
+            })
+            // setSelectedArea(data?.data?.locationPaths[0]?.paths)
+            setDefaultSelectedArea(data?.data?.locationPaths[0]?.paths)
+        }
+    }, [isSuccess, data])
+
+    console.log(selectedArea)
+
     return (
+
         <form onSubmit={handleSubmit(handleFormSubmit)} className='bg-[#fff9f9] p-5 md:p-8 max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] relative -mt-8 md:-mt-10 lg:-mt-24 z-20 mb-20 rounded-xl'>
 
-            <div>
-                <div className='flex flex-col justify-center items-center relative w-40 h-40 mx-auto'>
-                    <Image src={profileImg ? URL.createObjectURL(profileImg) : userImage} alt={'user photo'} fill className='rounded-full mx-auto object-cover' />
-
-                    <label htmlFor="chosePhoto" className='p-3 bg-primary text-secondary mx-auto font-poppins mt-3 cursor-pointer text-sm bg-white z-20 bg-opacity-80 rounded-full'>
-                        <MdOutlineAddPhotoAlternate className='' />
-                    </label>
-
-                    <input onChange={fileonChange} multiple={false} type="file" name="chosePhoto" id="chosePhoto" className='hidden' />
-
-                </div>
-            </div>
-
-            <div className='flex items-center gap-x-2 py-3 lg:py-4'>
-                <Image src={userIcon} placeholder='blur' className='w-auto h-5 lg:h-7 object-cover' alt="any job details icon" />
-                <h5 className='text-lg lg:text-xl font-extrabold text-black font-figtree'>Personal Information</h5>
-            </div>
+            {
+                isLoading ? <div className='min-h-40 flex items-center justify-center'>
+                    <ImSpinner8 className="text-4xl text-primary_red animate-spin" />
+                </div> : isError ? <ErrorComponent /> : isSuccess ?
 
 
-            {/* ------------------first name & last name--------------- */}
-            <div className='flex flex-col lg:flex-row gap-5'>
-                <div className="w-full mx-auto mb-3">
-                    <label htmlFor='first_name' className="mb-1.5 block text-black dark:text-white font-figtree">
-                        First Name
-                        <span className="text-red-500 text-base ml-1">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        id='first_name'
-                        {...register("firstName", { required: true })}
-                        placeholder="Enter First Name"
-                        className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.firstName ? 'border-danger' : 'dark:text-white border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
-                    />
-                    {errors?.firstName && <p className="text-red-500 text-sm col-span-2">{errors?.firstName?.message}</p>}
-                </div>
-                <div className="w-full mx-auto mb-3">
-                    <label htmlFor='last_name' className="mb-1.5 block text-black dark:text-white font-figtree">
-                        Last Name
-                        <span className="text-red-500 text-base ml-1">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        id='last_name'
-                        {...register("lastName", { required: true })}
-                        placeholder="Enter Last Name"
-                        className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.lastName ? 'border-danger' : 'dark:text-white border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
-                    />
-                    {errors?.lastName && <p className="text-red-500 text-sm col-span-2">{errors?.lastName?.message}</p>}
-                </div>
-            </div>
+                    <div>
 
-            {/* ------------------email------------------- */}
-            <div className="w-full mx-auto my-5">
-                <label htmlFor='email' className="mb-1.5 block text-black dark:text-white font-figtree">
-                    Email
-                    <span className="text-red-500 text-base ml-1">*</span>
-                </label>
-                <input
-                    type="email"
-                    id='email'
-                    {...register("email", {
-                        required: true, pattern: {
-                            value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, message: 'email invalid'
-                        }
-                    })}
-                    placeholder="Email"
-                    className={`w-full rounded-md bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] border-[1.5px] bg-transparent py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-poppins ${errors?.email ? 'border-danger' : 'dark:text-white border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
-                />
-                {errors?.email && <p className="text-red-500 text-sm col-span-2">{errors?.email?.message}</p>}
-            </div>
+                        <div>
+                            <div className='flex flex-col justify-center items-center relative w-40 h-40 mx-auto'>
+                                <Image src={profileImg ? URL.createObjectURL(profileImg) : (data?.data?.profilePicture || '/empty-profile-photo.jpg')} alt={'user photo'} fill className='rounded-full mx-auto object-cover' />
 
-            {/* -----------contact----------------- */}
-            <div className="w-full mx-auto mb-3">
-                <label htmlFor='Phone Number:' className="mb-1.5 block text-black dark:text-white font-figtree">
-                    Phone Number
-                    <span className="text-red-500 text-base ml-1">*</span>
-                </label>
-                <input
-                    type="number"
-                    id='Phone Number:'
-                    {...register("phone", {
-                        required: true, pattern: {
-                            value: /(?=.*?[0-9])/, message: 'phone number invalid'
-                        }
-                    })}
-                    placeholder="Enter phone number"
-                    className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.phone ? 'border-danger' : 'dark:text-white border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
-                />
-                {errors?.phone && <p className="text-red-500 text-sm col-span-2">{errors?.phone?.message}</p>}
-            </div>
+                                <label htmlFor="chosePhoto" className='p-3 bg-primary text-secondary mx-auto font-poppins mt-3 cursor-pointer text-sm bg-white z-20 bg-opacity-80 rounded-full'>
+                                    <MdOutlineAddPhotoAlternate className='' />
+                                </label>
+
+                                <input onChange={fileonChange} multiple={false} type="file" name="chosePhoto" id="chosePhoto" className='hidden' />
+
+                            </div>
+                        </div>
+
+                        <div className='flex items-center gap-x-2 py-3 lg:py-4'>
+                            <Image src={userIcon} placeholder='blur' className='w-auto h-5 lg:h-7 object-cover' alt="any job details icon" />
+                            <h5 className='text-lg lg:text-xl font-extrabold text-black font-figtree'>Personal Information</h5>
+                        </div>
 
 
-            {/* ------------------------county------------------ */}
-            <div className="w-full mx-auto mb-3">
+                        {/* ------------------first name & last name--------------- */}
+                        <div className='flex flex-col lg:flex-row gap-5'>
+                            <div className="w-full mx-auto mb-3">
+                                <label htmlFor='first_name' className="mb-1.5 block text-black dark:text-white font-figtree">
+                                    First Name
+                                    <span className="text-red-500 text-base ml-1">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id='first_name'
+                                    {...register("firstName", { required: true })}
+                                    placeholder="Enter First Name"
+                                    className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.firstName ? 'border-danger' : 'dark:text-white border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
+                                />
+                                {errors?.firstName && <p className="text-red-500 text-sm col-span-2">{errors?.firstName?.message}</p>}
+                            </div>
+                            <div className="w-full mx-auto mb-3">
+                                <label htmlFor='last_name' className="mb-1.5 block text-black dark:text-white font-figtree">
+                                    Last Name
+                                    <span className="text-red-500 text-base ml-1">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id='last_name'
+                                    {...register("lastName", { required: true })}
+                                    placeholder="Enter Last Name"
+                                    className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.lastName ? 'border-danger' : 'dark:text-white border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
+                                />
+                                {errors?.lastName && <p className="text-red-500 text-sm col-span-2">{errors?.lastName?.message}</p>}
+                            </div>
+                        </div>
+
+                        {/* ------------------email------------------- */}
+                        <div className="w-full mx-auto my-5">
+                            <label htmlFor='email' className="mb-1.5 block text-black dark:text-white font-figtree">
+                                Email
+                                <span className="text-red-500 text-base ml-1"></span>
+                            </label>
+                            <input
+                                type="email"
+                                id='email'
+                                disabled={true}
+                                placeholder="Email"
+                                defaultValue={isSuccess && data?.data?.email || ''}
+                                className={`w-full rounded-md bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] border-[1.5px] bg-transparent py-2.5 px-4 text-black outline-none transition disabled:cursor-not-allowed disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-poppins 'dark:text-white border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary`}
+                            />
+                        </div>
+
+                        {/* -----------contact----------------- */}
+                        <div className="w-full mx-auto mb-3">
+                            <label htmlFor='Phone Number:' className="mb-1.5 block text-black dark:text-white font-figtree">
+                                Phone Number
+                                <span className="text-red-500 text-base ml-1">*</span>
+                            </label>
+                            <input
+                                type="number"
+                                id='Phone Number:'
+                                {...register("phoneNumber", {
+                                    required: true, pattern: {
+                                        value: /(?=.*?[0-9])/, message: 'phone number invalid'
+                                    }
+                                })}
+                                placeholder="Enter phone number"
+                                className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.phoneNumber ? 'border-danger' : 'dark:text-white border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
+                            />
+                            {errors?.phoneNumber && <p className="text-red-500 text-sm col-span-2">{errors?.phoneNumber?.message}</p>}
+                        </div>
+
+                        {/* -=-------------------------address---------------------- */}
+                        <div className="w-full mx-auto mb-3">
+                            <label htmlFor='Address' className="mb-1.5 block text-black dark:text-white font-figtree">
+                                Address
+                                <span className="text-red-500 text-base ml-1">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id='Address'
+                                {...register("address", {
+                                    required: true
+                                })}
+                                placeholder="Enter Address"
+                                className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.address ? 'border-danger' : 'dark:text-white border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
+                            />
+                            {errors?.address && <p className="text-red-500 text-sm col-span-2">{errors?.address?.message}</p>}
+                        </div>
+
+
+                        {/* ------------------------county------------------ */}
+                        {/* <div className="w-full mx-auto mb-3">
                 <label htmlFor='brand' className="mb-1.5 block text-black dark:text-white font-figtree">
                     County
                     <span className="text-red-500 text-base ml-1">*</span>
@@ -198,10 +290,10 @@ const EditProfileForm = () => {
 
                 </Controller>
                 {errors?.county && <p className="text-red-500 text-sm col-span-2">{errors?.county?.message}</p>}
-            </div>
+            </div> */}
 
-            {/* ------------------town/city----------------- */}
-            <div className="w-full mx-auto mb-3">
+                        {/* ------------------town/city----------------- */}
+                        {/* <div className="w-full mx-auto mb-3">
                 <label htmlFor='town' className="mb-1.5 block text-black dark:text-white font-figtree">
                     Town/City
                     <span className="text-red-500 text-base ml-1">*</span>
@@ -214,203 +306,196 @@ const EditProfileForm = () => {
                     className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.town ? 'border-danger' : 'dark:text-white border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
                 />
                 {errors?.town && <p className="text-red-500 text-sm col-span-2">{errors?.town?.message}</p>}
-            </div>
-            
-
-            {/* ----------------experience--------------- */}
-            <div className="w-full mx-auto mb-3">
-                <label htmlFor='experience' className="mb-1.5 block text-black dark:text-white font-figtree">
-                    Experience
-                    <span className="text-red-500 text-base ml-1">*</span>
-                </label>
-                <input
-                    type="number"
-                    id='experience'
-                    {...register("experience", { required: true })}
-                    placeholder="Enter experience"
-                    className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.experience ? 'border-danger' : 'dark:text-white border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
-                />
-                {errors?.experience && <p className="text-red-500 text-sm col-span-2">{errors?.experience?.message}</p>}
-            </div>
-
-            {/* ----------------bio--------------- */}
-            <div className="w-full mx-auto mb-3">
-                <label htmlFor='bio' className="mb-1.5 block text-black dark:text-white font-figtree">
-                    Biography
-                    <span className="text-red-500 text-base ml-1">*</span>
-                </label>
-                <textarea
-                    rows={5}
-                    id='bio'
-                    {...register("bio", { required: true })}
-                    placeholder="Write your bio.........."
-                    className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.bio ? 'border-danger' : 'dark:text-white border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
-                />
-                {errors?.bio && <p className="text-red-500 text-sm col-span-2">{errors?.bio?.message}</p>}
-            </div>
-
-            {/* ----------------bio--------------- */}
-            <div className="w-full mx-auto mb-3">
-                <label htmlFor='Why choose me' className="mb-1.5 block text-black dark:text-white font-figtree">
-                    Why choose me
-                    <span className="text-red-500 text-base ml-1">*</span>
-                </label>
-                <textarea
-                    rows={5}
-                    id='Why choose me'
-                    {...register("why_choose", { required: true })}
-                    placeholder="Write why choose.........."
-                    className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.why_choose ? 'border-danger' : 'dark:text-white border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
-                />
-                {errors?.why_choose && <p className="text-red-500 text-sm col-span-2">{errors?.why_choose?.message}</p>}
-            </div>
+            </div> */}
 
 
-            
+                        {/* ----------------experience--------------- */}
+                        <div className="w-full mx-auto mb-3">
+                            <label htmlFor='experience' className="mb-1.5 block text-black dark:text-white font-figtree">
+                                Experience
+                                <span className="text-red-500 text-base ml-1">*</span>
+                            </label>
+                            <input
+                                type="number"
+                                id='experience'
+                                {...register("experience", { required: true })}
+                                placeholder="Enter experience"
+                                className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.experience ? 'border-danger' : 'dark:text-white border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
+                            />
+                            {errors?.experience && <p className="text-red-500 text-sm col-span-2">{errors?.experience?.message}</p>}
+                        </div>
 
-            <div className='flex items-center gap-x-2 py-3 lg:py-4'>
-                <Image src={locationIcon} placeholder='blur' className='w-auto h-5 lg:h-7 object-cover' alt="any job details icon" />
-                <h5 className='text-lg lg:text-xl font-extrabold text-black font-figtree'>Location</h5>
-            </div>
-            
+                        {/* ----------------bio--------------- */}
+                        <div className="w-full mx-auto mb-3">
+                            <label htmlFor='bio' className="mb-1.5 block text-black dark:text-white font-figtree">
+                                Biography
+                                <span className="text-red-500 text-base ml-1">*</span>
+                            </label>
+                            <textarea
+                                rows={5}
+                                id='bio'
+                                {...register("bio", { required: true })}
+                                placeholder="Write your bio.........."
+                                className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.bio ? 'border-danger' : 'dark:text-white border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
+                            />
+                            {errors?.bio && <p className="text-red-500 text-sm col-span-2">{errors?.bio?.message}</p>}
+                        </div>
 
-            {/* --------------------location map---------------- */}
-            <div className="w-full mx-auto mb-3">
-                <label htmlFor='location' className="mb-1.5 block text-black dark:text-white font-figtree">
-                    Choose the areas where you can provide your service?
-                    {/* <span className="text-red-500 text-base ml-1">*</span> */}
-                </label>
-                <MapWithDrawing height='300px' />
-            </div>
+                        {/* ----------------why choose me--------------- */}
+                        <div className="w-full mx-auto mb-3">
+                            <label htmlFor='Why choose me' className="mb-1.5 block text-black dark:text-white font-figtree">
+                                Why choose me
+                                <span className="text-red-500 text-base ml-1">*</span>
+                            </label>
+                            <textarea
+                                rows={5}
+                                id='Why choose me'
+                                {...register("whyChooseMe", { required: true })}
+                                placeholder="Write why choose.........."
+                                className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.whyChooseMe ? 'border-danger' : 'dark:text-white border-stroke focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
+                            />
+                            {errors?.whyChooseMe && <p className="text-red-500 text-sm col-span-2">{errors?.whyChooseMe?.message}</p>}
+                        </div>
 
-            
 
-            <div className='flex items-center gap-x-2 py-3 lg:py-4'>
-                <Image src={serviceIcon} placeholder='blur' className='w-auto h-5 lg:h-7 object-cover' alt="any job details icon" />
-                <h5 className='text-lg lg:text-xl font-extrabold text-black font-figtree'>Service</h5>
-            </div>
 
-            {/* -------------my services-------------- */}
-            <div className='w-full mx-auto mb-4'>
-                <label htmlFor='service' className="mb-1.5 block text-black font-medium dark:text-white font-figtree">
-                    Which type of service offer you want to add?
-                    <span className="text-red-500 text-base ml-1">*</span>
-                </label>
-                <MultipleSelect
-                    name='service'
-                    items={services?.map(ser => {
-                        return { label: ser, value: ser }
-                    })}
-                    control={control}
-                    errors={errors}
-                    placeholder='select service'
-                    validationRules={{
-                        required: "Service is required",
-                    }}
-                />
-            </div>
+                        <div className='flex items-center gap-x-2 py-3 lg:py-4'>
+                            <Image src={locationIcon} placeholder='blur' className='w-auto h-5 lg:h-7 object-cover' alt="any job details icon" />
+                            <h5 className='text-lg lg:text-xl font-extrabold text-black font-figtree'>Location</h5>
+                        </div>
 
-            <div className='flex items-center gap-x-2 py-3 lg:py-4'>
-                <Image src={coinIcon} placeholder='blur' className='w-auto h-5 lg:h-7 object-cover' alt="any job details icon" />
-                <h5 className='text-lg lg:text-xl font-extrabold text-black font-figtree'>Pricing & availability</h5>
-            </div>
 
-            {/* ---------budget------------ */}
-            <div className="w-full mx-auto mb-3">
-                <label htmlFor='Budget' className="mb-1.5 block text-black dark:text-white font-figtree">
-                    Price Range
-                    {/* <span className="text-red-500 text-base ml-1">*</span> */}
-                </label>
-                <input
-                    type="number"
-                    id='Budget'
-                    {...register("price")}
-                    placeholder="Enter price"
-                    className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.price ? 'border-danger' : 'dark:text-white border-strokeinput focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
-                />
-                {errors?.price && <p className="text-red-500 text-sm col-span-2">{errors?.price?.message}</p>}
-            </div>
+                        {/* --------------------location map---------------- */}
+                        <div className="w-full mx-auto mb-3">
+                            <label htmlFor='location' className="mb-1.5 block text-black dark:text-white font-figtree">
+                                Choose the areas where you can provide your service?
+                                {/* <span className="text-red-500 text-base ml-1">*</span> */}
+                            </label>
 
-            {/* ------------availability------------ */}
-            <div className="w-full mx-auto mb-3">
-                <label htmlFor='Availability Status' className="mb-1.5 block text-black dark:text-white font-figtree">
-                    Availability Status
-                    <span className="text-red-500 text-base ml-1">*</span>
-                </label>
-                <Controller
-                    name={'availability'}
-                    control={control}
-                    rules={{
-                        required: true,
-                    }}
-                    render={({ field }) => (
-                        <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                        >
-                            <SelectTrigger className={`bg-form px-4 py-3 rounded-md  text-sm font-figtree w-full text-primary bg-secondary border shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] ${errors?.county ? "font-medium  border-danger" : "border-stroke"}`}>
-                                <SelectValue placeholder={"Availability"} />
-                            </SelectTrigger>
-                            <SelectContent className="rounded-sm text-sm font-figtree bg-form">
-                                {
-                                    ["Flexible schedule", "Not Available"]?.map(item => {
-                                        return <SelectItem key={item} value={item} className="h-10 font-figtree text-base font-medium hover:!bg-white">{item}</SelectItem>
-                                    })
-                                }
-                            </SelectContent>
-                        </Select>
-                    )} >
-
-                </Controller>
-                {errors?.availability && <p className="text-red-500 text-sm col-span-2">{errors?.availability?.message}</p>}
-            </div>
-
-            <div className='flex items-center gap-x-2 py-3 lg:py-4'>
-                <Image src={workIcon} placeholder='blur' className='w-auto h-5 lg:h-7 object-cover' alt="any job details icon" />
-                <h5 className='text-lg lg:text-xl font-extrabold text-black font-figtree'>Work Photos</h5>
-            </div>
-
-            {/* ---------atach ment------------ */}
-            <div className="w-full mx-auto mb-3">
-                <label htmlFor='img' className="mb-1.5 block text-black dark:text-white font-figtree">
-                    Upload Images
-                    {/* <span className="text-red-500 text-base ml-1">*</span> */}
-                </label>
-                <input
-                    type="file"
-                    id='img'
-                    accept="image/*"
-                    multiple
-                    onChange={uploadServiceImg}
-                    className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree dark:text-white border-strokeinput focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary`}
-                />
-
-                {
-                    servicePhotos?.map((img, indx) => {
-                        return <div key={indx} className='flex flex-row justify-between items-center p-1 border border-stroke rounded-md mb-2'>
-                            <div className='relative w-14 h-14'>
-                                <Image src={URL.createObjectURL(img)} fill className='h-full w-full object-cover rounded-md' alt='any job atachment' />
+                            <div className=''>
+                                <MapWithDrawing height='300px' defaultSelectedArea={data?.data?.locationPaths[0]?.paths} selectedArea={selectedArea} setSelectedArea={setSelectedArea} />
                             </div>
-                            <button onClick={() => removeImg(indx)} className='border border-stroke bg-zinc-200 rounded p-1 mr-2'>
-                                <MdDeleteOutline className='text-lg text-danger' />
+
+                            <button type='button' className='border border-stroke rounded text-xs text-gray-700 font-figtree px-2 py-1 mt-2 float-end bg-slate-50 hover:bg-slate-100 duration-200' onClick={() => {
+                                setSelectedArea([])
+                                setDefaultSelectedArea([])
+                            }} >
+                                Clear
                             </button>
                         </div>
-                    })
-                }
-            </div>
 
 
-            <div className="w-full grid grid-cols-2 gap-x-2 items-center mt-8">
-                <button type='submit' className="w-full bg-primary_red hover:bg-opacity-85 text-white font-medium px-4 py-2.5 rounded-md transition-colors font-figtree">
-                    Update
-                </button>
+                        <div className='flex items-center gap-x-2 py-3 lg:py-4'>
+                            <Image src={serviceIcon} placeholder='blur' className='w-auto h-5 lg:h-7 object-cover' alt="any job details icon" />
+                            <h5 className='text-lg lg:text-xl font-extrabold text-black font-figtree'>Service</h5>
+                        </div>
 
-                <button type='button' className="w-full border border-primary_red bg-transparent text-primary_red hover:bg-primary_red hover:text-white font-medium px-4 py-2.5 rounded-md transition-colors font-figtree">
-                    Cencel
-                </button>
+                        {/* -------------my services-------------- */}
+                        <div className='w-full mx-auto mb-4'>
+                            <label htmlFor='service' className="mb-1.5 block text-black font-medium dark:text-white font-figtree">
+                                Which type of service offer you want to add?
+                                <span className="text-red-500 text-base ml-1">*</span>
+                            </label>
+                            <div className='shadow-[0_4px_18px_0_rgba(0,0,0,0.09)]'>
+                                <MultipleSelect
+                                    name='userServices'
+                                    isLoading={serviceLoading}
+                                    items={serviceSuccess ? services?.data?.map(ser => {
+                                        return { label: ser?.name, value: ser?.name }
+                                    }) : []}
+                                    control={control}
+                                    errors={errors}
+                                    placeholder='select service'
+                                    validationRules={{
+                                        required: "Service is required",
+                                    }}
+                                />
+                            </div>
+                        </div>
 
-            </div>
+                        <div className='flex items-center gap-x-2 py-3 lg:py-4'>
+                            <Image src={coinIcon} placeholder='blur' className='w-auto h-5 lg:h-7 object-cover' alt="any job details icon" />
+                            <h5 className='text-lg lg:text-xl font-extrabold text-black font-figtree'>Pricing & availability</h5>
+                        </div>
 
+                        {/* ---------budget------------ */}
+                        <div className="w-full mx-auto mb-3">
+                            <label htmlFor='Budget' className="mb-1.5 block text-black dark:text-white font-figtree">
+                                Hourly Rate
+                                {/* <span className="text-red-500 text-base ml-1">*</span> */}
+                            </label>
+                            <input
+                                type="number"
+                                id='Budget'
+                                {...register("minPricing")}
+                                placeholder="Enter price"
+                                className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.minPricing ? 'border-danger' : 'dark:text-white border-strokeinput focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
+                            />
+                            {errors?.minPricing && <p className="text-red-500 text-sm col-span-2">{errors?.minPricing?.message}</p>}
+                        </div>
+
+                        {/* ------------availability------------ */}
+                        <div className="w-full mx-auto mb-3">
+                            <label htmlFor='Availability Status' className="mb-1.5 block text-black dark:text-white font-figtree">
+                                Availability Status
+                                <span className="text-red-500 text-base ml-1">*</span>
+                            </label>
+                            <Controller
+                                name={'availability'}
+                                control={control}
+                                rules={{
+                                    required: true,
+                                }}
+                                render={({ field }) => (
+                                    <Select
+                                        onValueChange={field.onChange}
+                                        defaultValue={field.value}
+                                    >
+                                        <SelectTrigger className={`bg-form px-4 py-3 rounded-md  text-sm font-figtree w-full text-primary bg-secondary border shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] ${errors?.availability ? "font-medium  border-danger" : "border-stroke"}`}>
+                                            <SelectValue placeholder={"Availability"} />
+                                        </SelectTrigger>
+                                        <SelectContent className="rounded-sm text-sm font-figtree bg-form">
+                                            {
+                                                ["Flexible schedule", "Not Available"]?.map(item => {
+                                                    return <SelectItem key={item} value={item} className="h-10 font-figtree text-base font-medium hover:!bg-white">{item}</SelectItem>
+                                                })
+                                            }
+                                        </SelectContent>
+                                    </Select>
+                                )} >
+
+                            </Controller>
+                            {errors?.availability && <p className="text-red-500 text-sm col-span-2">{errors?.availability?.message}</p>}
+                        </div>
+
+                        <div className='flex items-center gap-x-2 py-3 lg:py-4'>
+                            <Image src={workIcon} placeholder='blur' className='w-auto h-5 lg:h-7 object-cover' alt="any job details icon" />
+                            <h5 className='text-lg lg:text-xl font-extrabold text-black font-figtree'>Work Photos</h5>
+                        </div>
+
+                        {/* ---------atach ment------------ */}
+                        <FilesManager uploadServiceImg={uploadServiceImg} servicePhotos={servicePhotos} setServicePhotos={setServicePhotos} defaultImgs={data?.data?.workPhotos} />
+
+
+                        <div className="w-full grid grid-cols-2 gap-x-2 items-center mt-8">
+
+                            <Link href='/contructor' className="w-full border border-primary_red bg-transparent text-primary_red hover:bg-primary_red hover:text-white font-medium px-4 py-2.5 rounded-md transition-colors font-figtree text-center">
+                                Cencel
+                            </Link>
+
+                            <button type='submit' disabled={updateLoading} className=" disabled:cursor-not-allowed w-full bg-primary_red hover:bg-opacity-85 text-white font-medium px-4 py-2.5 rounded-md transition-colors font-figtree flex flex-row gap-x-2 justify-center items-center">
+                                {updateLoading && <ImSpinner2 className="text-lg text-white animate-spin" />}
+                                <span>{updateLoading ? 'Loading...' : "Update"}</span>
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                    :
+
+                    <></>
+            }
 
         </form>
 

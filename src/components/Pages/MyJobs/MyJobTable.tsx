@@ -1,9 +1,7 @@
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
-    TableFooter,
     TableHead,
     TableHeader,
     TableRow,
@@ -14,62 +12,14 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import JobDetailsModal from "./JobDetailsModal";
+import { myjobsType } from "@/redux/types";
+import QuotesPreview from "./QuotesPreview";
+import moment from "moment";
 
-
-const data = [
-    {
-        name: "Hriday Paul",
-        phone: "+8801678678768",
-        job_create_date : "Jan 10, 2025 - 09 AM",
-        date: "Feb 10, 2025 - 10 AM",
-        price: 250,
-        status: "In pregress",
-        isPaid: true,
-    },
-    {
-        name: "Seanokane",
-        phone: "+8801678678768",
-        job_create_date : "Jan 10, 2025 - 09 AM",
-        date: "Feb 10, 2025 - 10 AM",
-        price: 180,
-        status: "Complete",
-        isPaid: false,
-    },
-    {
-        name: "Hriday Paul",
-        phone: "+8801678678768",
-        job_create_date : "Jan 10, 2025 - 09 AM",
-        date: "Feb 15, 2025 - 10 AM",
-        price: 50,
-        status: "Cancel",
-        isPaid: true,
-    },
-    {
-        name: "Hriday Paul",
-        phone: "+8801678678768",
-        job_create_date : "Jan 10, 2025 - 09 AM",
-        date: "Feb 10, 2025 - 10 AM",
-        price: 250,
-        status: "In pregress",
-        isPaid: true,
-    },
-    {
-        name: "Seanokane",
-        phone: "+8801678678768",
-        job_create_date : "Jan 10, 2025 - 09 AM",
-        date: "Feb 10, 2025 - 10 AM",
-        price: 180,
-        status: "Complete",
-        isPaid: false,
-    },
-];
-
-function MyJobTable() {
+function MyJobTable({ data }: { data: myjobsType[] }) {
     return (
         <div className="pb-8">
             <Table className="-z-10 font-figtree">
@@ -77,8 +27,9 @@ function MyJobTable() {
                     <TableRow className="!rounded-t-lg">
                         <TableHead className="p-5 !rounded-tl-lg font-medium font-figtree">Name</TableHead>
                         <TableHead className="font-medium font-figtree">Phone</TableHead>
-                        <TableHead className="font-medium font-figtree">Job created</TableHead>
-                        <TableHead className="font-medium font-figtree">Job completed</TableHead>
+                        <TableHead className="font-medium font-figtree">Email</TableHead>
+                        <TableHead className="font-medium font-figtree">Job date</TableHead>
+                        {/* <TableHead className="font-medium font-figtree">Job completed</TableHead> */}
                         <TableHead className="font-medium font-figtree">Price</TableHead>
                         <TableHead className="font-medium font-figtree min-w-32">Status</TableHead>
                         <TableHead className="font-medium font-figtree">Payment</TableHead>
@@ -87,17 +38,19 @@ function MyJobTable() {
                 </TableHeader>
                 <TableBody className="border border-stroke">
                     {data.map((job) => (
-                        <TableRow key={job?.name}>
-                            <TableCell className="font-medium p-5">{job?.name}</TableCell>
-                            <TableCell>{job?.phone}</TableCell>
-                            <TableCell>{job?.job_create_date}</TableCell>
-                            <TableCell>{job?.date}</TableCell>
-                            <TableCell>${job?.price}</TableCell>
+
+                        <TableRow key={job?.id}>
+                            <TableCell className="font-medium p-5">{job?.job?.firstName + " " + job?.job?.lastName}</TableCell>
+                            <TableCell>{job?.job?.phoneNumber}</TableCell>
+                            <TableCell>{job?.job?.email}</TableCell>
+                            <TableCell>{moment(job?.job?.preferredJobDate).format("MMM Do YYYY")}</TableCell>
+                            {/* <TableCell>{job?.job?.createdAt}</TableCell> */}
+                            <TableCell>${job?.job?.budget}</TableCell>
                             <TableCell>
-                                {job?.status == 'Cancel' ? <span className="bg-primary_red/20 text-primary_red px-2.5 py-1 rounded-full">Cancel</span> : job?.status == 'Complete' ? <span className="bg-success/20 text-success px-2.5 py-1 rounded-full">Complete</span> : <span className="bg-black/20 text-black px-2.5 py-1 rounded-full text-sm">In pregress</span>}
+                                {job?.status == 'COMPLETED' ? <span className="bg-success/20 text-success px-2.5 py-1 rounded-full">Accepted</span> : <span className="bg-black/20 text-black px-2.5 py-1 rounded-full text-sm">In pregress</span>}
                             </TableCell>
                             <TableCell>
-                                {!job?.isPaid ? <span className="text-primary_red">Unpaid</span> : <span className="text-success">Paid</span>}
+                                {!job?.paymentStatus ? <span className="text-primary_red">Unpaid</span> : <span className="text-success">Paid</span>}
                             </TableCell>
                             <TableCell className="text-right p-5">
 
@@ -118,12 +71,22 @@ function MyJobTable() {
                                                 clicker={
                                                     <p className="text-sm font-figtree px-2 w-full">View Job</p>
                                                 }
+                                                job={job?.job}
                                             />
                                         </DropdownMenuItem>
 
-                                        <DropdownMenuItem className="hover:bg-zinc-100 duration-150">Complete</DropdownMenuItem>
+                                        <DropdownMenuItem asChild className="hover:bg-zinc-100 duration-150">
+                                            <QuotesPreview
+                                                clicker={
+                                                    <p className="text-sm font-figtree px-2 w-full">Preview Quote</p>
+                                                }
+                                                quote={job}
+                                            />
+                                        </DropdownMenuItem>
+
+                                        {/* <DropdownMenuItem className="hover:bg-zinc-100 duration-150">Complete</DropdownMenuItem>
                                         <DropdownMenuItem className="hover:bg-zinc-100 duration-150">Cencel</DropdownMenuItem>
-                                        <DropdownMenuItem className="hover:bg-zinc-100 duration-150">Paid</DropdownMenuItem>
+                                        <DropdownMenuItem className="hover:bg-zinc-100 duration-150">Paid</DropdownMenuItem> */}
                                     </DropdownMenuContent>
                                 </DropdownMenu>
 

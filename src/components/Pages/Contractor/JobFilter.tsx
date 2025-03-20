@@ -1,22 +1,35 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CiSearch } from 'react-icons/ci';
 import { Popover, PopoverTrigger, PopoverContent } from "@radix-ui/react-popover"
 import { CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from "date-fns"
 import { DateRange } from "react-day-picker"
+import { useSearchParams } from 'next/navigation';
 
-const JobFilter = () => {
+const JobFilter = ({ date, setDate, setDebouncedSearchTerm }: { date: DateRange | undefined, setDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>, setDebouncedSearchTerm: React.Dispatch<React.SetStateAction<string>> }) => {
 
-    const [date, setDate] = React.useState<DateRange | undefined>(undefined)
+    const Defaultsearch = useSearchParams().get('search')
 
+    const [searchTerm, setSearchTerm] = useState(Defaultsearch || '');
+
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearchTerm(searchTerm);
+        }, 500);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [searchTerm]);
 
     return (
         <div className='max-w-2xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-5 items-center py-8'>
             <form className=' bg-[#fce9ea80] shadow-md border border-stroke py-2.5 md:py-3 pl-3 md:pl-4 pr-3 md:pr-4 flex flex-row justify-between gap-x-3 items-center rounded-lg'>
                 <CiSearch className='text-2xl text-zinc-700' />
-                <input type="text" name='search' className='border-none outline-none focus:border-none focus:outline-none font-figtree text-base w-full placeholder:font-poppins placeholder:text-zinc-600 bg-transparent' placeholder={'search...'} />
+                <input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} type="text" name='search' className='border-none outline-none focus:border-none focus:outline-none font-figtree text-base w-full placeholder:font-poppins placeholder:text-zinc-600 bg-transparent' placeholder={'search...'} />
             </form>
             <Popover>
                 <PopoverTrigger asChild>

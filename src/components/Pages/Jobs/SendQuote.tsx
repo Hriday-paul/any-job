@@ -8,16 +8,16 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { CalendarIcon, Star } from "lucide-react";
-import Image from "next/image";
-import React from "react";
-import userImg from '../../../../public/quotes/user.jpeg'
-import Link from "next/link";
+import { CalendarIcon } from "lucide-react";
+import React, { useState } from "react";
 import Swal from "sweetalert2";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
+import { useSendQuoteMutation } from "@/redux/api/jobsApi";
+import { ImSpinner2 } from "react-icons/im";
+import { DateTimePicker } from "@/components/ui/DateTimePicker";
 
 type sendQuoteType = {
     price: number,
@@ -25,7 +25,11 @@ type sendQuoteType = {
     message: string
 }
 
-export function SendQuote({ clicker }: { clicker: React.ReactNode }) {
+export function SendQuote({ clicker, id }: { clicker: React.ReactNode, id: string }) {
+
+    const [postQuote, { isLoading }] = useSendQuoteMutation();
+
+    const [open, setOpen] = useState<boolean>(false)
 
     const {
         register,
@@ -36,26 +40,51 @@ export function SendQuote({ clicker }: { clicker: React.ReactNode }) {
     } = useForm<sendQuoteType>();
 
     const handleFormSubmit: SubmitHandler<sendQuoteType> = async (data) => {
-        console.log(data)
-        Swal.fire({
-            title: "Your quotes has been send successfully!",
-            text: "Job poster will review your quotes. You’ll be notified in you email when a quote arrives.",
-            icon: "success",
-            customClass: {
-                title: "text-xl text-black font-medium font-figtree",
-                container: "text-sm font-medium font-figtree text-zinc-800",
-                cancelButton: "bg-primary_red text-white",
-                confirmButton: "bg-primary_red text-white"
-            },
-            showCancelButton: true,
-            showConfirmButton: false,
-            cancelButtonText: "Close",
-        });
+
+        try {
+            const res = await postQuote({ jobId: id, message: data?.message, price: Number(data?.price), scheduleDateTime: data?.date, availability: "available" })
+
+            if (res?.data?.success) {
+
+                Swal.fire({
+                    title: "Your quotes has been send successfully!",
+                    text: "Job poster will review your quotes. You’ll be notified in you email when a quote arrives.",
+                    icon: "success",
+                    customClass: {
+                        title: "text-xl text-black font-medium font-figtree",
+                        container: "text-sm font-medium font-figtree text-zinc-800",
+                        cancelButton: "bg-primary_red text-white",
+                        confirmButton: "bg-primary_red text-white"
+                    },
+                    showCancelButton: true,
+                    showConfirmButton: false,
+                    cancelButtonText: "Close",
+                });
+            }
+
+        } catch (err: any) {
+            Swal.fire({
+                title: err?.data?.message || "Something went wrong",
+                // text: "Job poster will review your quotes. You’ll be notified in you email when a quote arrives.",
+                icon: "error",
+                customClass: {
+                    title: "text-xl text-black font-medium font-figtree",
+                    container: "text-sm font-medium font-figtree text-zinc-800",
+                    cancelButton: "bg-primary_red text-white",
+                    confirmButton: "bg-primary_red text-white"
+                },
+                showCancelButton: true,
+                showConfirmButton: false,
+                cancelButtonText: "Close",
+            });
+        } finally {
+            setOpen(false)
+        }
     }
 
     return (
-        <Dialog>
-            <DialogTrigger asChild>
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild onClick={() => setOpen(true)} >
                 {clicker}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
@@ -91,7 +120,7 @@ export function SendQuote({ clicker }: { clicker: React.ReactNode }) {
                                 Scheduled Date & Time:
                                 <span className="text-red-500 text-base ml-1">*</span>
                             </label>
-                            <Controller
+                            {/* <Controller
                                 name={'date'}
                                 defaultValue={new Date()}
                                 control={control}
@@ -118,7 +147,9 @@ export function SendQuote({ clicker }: { clicker: React.ReactNode }) {
                                     </Popover>
                                 )} >
 
-                            </Controller>
+                            </Controller> */}
+
+                            <DateTimePicker control={control} name="date" />
                             {errors?.date && <p className="text-red-500 text-sm col-span-2">{errors?.date?.message}</p>}
                         </div>
 
@@ -138,11 +169,10 @@ export function SendQuote({ clicker }: { clicker: React.ReactNode }) {
                             {errors?.message && <p className="text-red-500 text-sm col-span-2">{errors?.message?.message}</p>}
                         </div>
 
-                        <DialogClose asChild className="w-full">
-                            <button type="submit" className="w-full bg-primary_red hover:bg-opacity-85 text-white font-medium px-4 py-2.5 rounded-md transition-colors font-figtree">
-                                Send Quote
-                            </button>
-                        </DialogClose>
+                        <button type='submit' disabled={isLoading} className='bg-primary_red py-2.5 font-figtree text-secondary rounded-md w-full mt-5 hover:bg-opacity-80 duration-200 flex flex-row gap-x-2 items-center justify-center disabled:bg-opacity-60 text-white'>
+                            {isLoading && <ImSpinner2 className="text-lg text-white animate-spin" />}
+                            <span>{isLoading ? 'Loading...' : "Send Quote"}</span>
+                        </button>
 
                     </form>
                 </div>

@@ -17,12 +17,14 @@ interface MultipleSelectProps<T extends FieldValues> {
 
     defaultSelected?: { value: string; label: string }[];
     items: { value: string; label: string }[];
+    isLoading?: boolean
 }
 
 export default function MultipleSelect<T extends FieldValues>({
     defaultSelected = [],
     items,
     control,
+    isLoading = false,
     name,
     errors,
     placeholder = "Select options",
@@ -38,10 +40,11 @@ export default function MultipleSelect<T extends FieldValues>({
             render={({ field }) => {
                 const selectedValues = field.value || defaultSelected
 
-                const handleSelect = (value: string, label: string) => {
-                    const updatedValues = selectedValues.some((item: any) => item.value === value)
-                        ? selectedValues.filter((item: any) => item.value !== value)
-                        : [...selectedValues, { value, label }]
+                const handleSelect = (value: string) => {
+
+                    const updatedValues = selectedValues.some((item: any) => item === value)
+                        ? selectedValues.filter((item: any) => item !== value)
+                        : [...selectedValues, value]
 
                     field.onChange(updatedValues)
                 }
@@ -50,7 +53,7 @@ export default function MultipleSelect<T extends FieldValues>({
                     <Popover open={open} onOpenChange={setOpen}>
                         <PopoverTrigger asChild>
                             <Button variant="outline" role="combobox" aria-expanded={open} className={`w-full justify-between bg-zinc-100 text-base font-figtree py-[22px] ${errors?.[name]?.message ? "border-danger" : ""}`}>
-                                {selectedValues.length > 0 ? `${selectedValues.length} selected` : placeholder}
+                                {isLoading ? <span className="loader"></span> : selectedValues.length > 0 ? `${selectedValues.length} selected` : placeholder}
                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
                         </PopoverTrigger>
@@ -61,11 +64,11 @@ export default function MultipleSelect<T extends FieldValues>({
                                     <CommandEmpty>No options found.</CommandEmpty>
                                     <CommandGroup>
                                         {items.map((item) => (
-                                            <CommandItem key={item.value} onSelect={() => handleSelect(item.value, item.label)} className="hover:bg-zinc-100 duration-150">
+                                            <CommandItem key={item.value} onSelect={() => handleSelect(item.value)} className="hover:bg-zinc-100 duration-150">
                                                 <Check
                                                     className={cn(
                                                         "mr-2 h-4 w-4",
-                                                        selectedValues.some((selected: any) => selected.value === item.value)
+                                                        selectedValues.some((selected: any) => selected === item.value)
                                                             ? "opacity-100"
                                                             : "opacity-0"
                                                     )}

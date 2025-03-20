@@ -8,10 +8,11 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import serviceImg from "../../../../public/works/img2.png"
-import Image from 'next/image';
+import { jobType } from '@/redux/types';
+import JobImagePreview from '@/components/Shared/JobImagePreview';
+import moment from 'moment';
 
-const JobDetailsModal = ({ clicker }: { clicker: React.ReactNode }) => {
+const JobDetailsModal = ({ clicker, job }: { clicker: React.ReactNode, job: jobType }) => {
     return (
         <Dialog>
             <DialogTrigger className='w-full text-left py-1.5 hover:bg-zinc-100 duration-150'>
@@ -31,48 +32,43 @@ const JobDetailsModal = ({ clicker }: { clicker: React.ReactNode }) => {
                     <div className="px-4 py-4 space-y-2 bg-[#fce9ea80] rounded-md">
                         <div className="flex gap-1">
                             <span className="text-base font-medium">Job Title:</span>
-                            <span className="text-base text-zinc-800">Pipe Repair in Kitchen</span>
+                            <span className="text-base text-zinc-800">{job?.title}</span>
                         </div>
 
                         <div className="flex gap-1">
                             <span className="text-base font-medium">Job Description:</span>
-                            <span className="text-base text-zinc-800">Pipe Repair in Kitchen</span>
+                            <span className="text-base text-zinc-800">{job?.description}</span>
                         </div>
 
                         <div className="flex gap-1">
-                            <span className="text-base font-medium">Category:</span>
-                            <span className="text-base text-zinc-800">Home Service</span>
+                            <span className="text-base font-medium">Service:</span>
+                            <span className="text-base text-zinc-800">{job?.service}</span>
                         </div>
 
                         <div className="flex gap-1">
-                            <span className="text-base font-medium">County:</span>
-                            <span className="text-base text-zinc-800">Dublin</span>
-                        </div>
-
-                        <div className="flex gap-1">
-                            <span className="text-base font-medium">Town:</span>
-                            <span className="text-base text-zinc-800">Dublin</span>
+                            <span className="text-base font-medium">Location:</span>
+                            <span className="text-base text-zinc-800">{job?.address}</span>
                         </div>
 
                         <div className="flex gap-1">
                             <span className="text-base font-medium">Preferred Job Date:</span>
-                            <span className="text-base text-zinc-800">Feb 10, 2025</span>
+                            <span className="text-base text-zinc-800">{moment(job?.preferredJobDate).format("MMM Do YYYY")}</span>
                         </div>
 
                         <div className="flex gap-1">
                             <span className="text-base font-medium">Time Preference:</span>
-                            <span className="text-base text-zinc-800">8-12 AM</span>
+                            <span className="text-base text-zinc-800">{job?.time || '-----'}</span>
                         </div>
 
                         <div className="flex gap-1">
                             <span className="text-base font-medium">Estimate Budget:</span>
-                            <span className="text-base text-zinc-800">$140</span>
+                            <span className="text-base text-zinc-800">${job?.budget}</span>
                         </div>
 
-                        <div className="flex gap-1 items-center">
+                        {/* <div className="flex gap-1 items-center">
                             <span className="text-base font-medium">Status:</span>
                             <span className="text-sm bg-blue-100 text-blue-600 px-2 py-0.5 rounded-lg">Completed</span>
-                        </div>
+                        </div> */}
                     </div>
 
                     {/* Additional Details Section */}
@@ -92,16 +88,18 @@ const JobDetailsModal = ({ clicker }: { clicker: React.ReactNode }) => {
                                     strokeLinejoin="round"
                                 />
                             </svg>
-                            <span className="text-base font-figtree text-gray-600">Additional Details (Optional)</span>
+                            <span className="text-base font-figtree text-gray-600">Additional Details</span>
                         </div>
 
-                        <div className="rounded-lg overflow-hidden mb-3">
+                        {/* <div className="rounded-lg overflow-hidden mb-3">
                             <Image src={serviceImg} height={1000} width={2000} alt="work banner" className="w-full h-48 object-cover" />
-                        </div>
+                        </div> */}
+
+                        <JobImagePreview images={job?.jobAdditionalDetails || []} />
 
                         <div className="space-y-1">
                             <div className="text-base font-figtree">Special Instructions:</div>
-                            <div className="text-base font-figtree">Urgent service. Please confirm availability.</div>
+                            <div className="text-base font-figtree">{job?.specialInstructions}</div>
                         </div>
                     </div>
 

@@ -1,28 +1,50 @@
 "use client"
+import { useForgotPasswordMutation } from '@/redux/api/authApi';
 import { useRouter } from 'next/navigation';
 import React from 'react';
+import { useCookies } from 'react-cookie';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { ImSpinner2 } from 'react-icons/im';
+import { toast } from 'sonner';
+import { config } from '../../../../utils/config';
 
 type forgotType = {
     email: string
 }
 
 const ForgotPasswordForm = () => {
+    const [postResendOtpEmail, { isLoading }] = useForgotPasswordMutation()
+    const [_, setCookie] = useCookies(['token']);
     const {
         register,
         handleSubmit,
+        reset,
         formState: { errors },
     } = useForm<forgotType>();
 
     const router = useRouter();
 
     const handleFormSubmit: SubmitHandler<forgotType> = async (data) => {
-        console.log(data)
-        router.push('/verify-otp')
-    }
+        try {
 
-    const isLoading = false;
+            const res = await postResendOtpEmail(data).unwrap()
+            toast.success(res?.message || 'Otp Send successfully');
+            reset();
+
+            setCookie('token', res?.data?.token, {
+                httpOnly: config.hasSSL,
+                // maxAge: 14 * 24 * 60 * 60, // 14 days
+                path: '/',
+                sameSite: 'lax',
+                secure: config.env === 'production',
+            });
+
+            router.push('/verify-otp?next=/reset-password')
+
+        } catch (err: any) {
+            toast.error(err?.data?.message || 'Something went wrong, try again');
+        }
+    }
 
     return (
         <form onSubmit={handleSubmit(handleFormSubmit)} className='bg-white max-w-xl rounded-xl shadow-md p-8 mx-auto'>
@@ -44,7 +66,7 @@ const ForgotPasswordForm = () => {
 
             <button type='submit' disabled={isLoading} className='bg-primary_red py-3 font-figtree text-secondary rounded-lg w-full mt-5 hover:bg-opacity-90 duration-200 flex flex-row gap-x-2 items-center justify-center disabled:bg-opacity-60 text-white'>
                 {isLoading && <ImSpinner2 className="text-lg text-white animate-spin" />}
-                <span>{isLoading ? 'Loading...' : "Sign In"}</span>
+                <span>{isLoading ? 'Loading...' : "Send"}</span>
             </button>
         </form>
     );

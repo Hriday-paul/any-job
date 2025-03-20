@@ -4,6 +4,9 @@ import "./globals.css";
 import Navbar from "@/components/Shared/Navbar/Navbar";
 import Footer from "@/components/Shared/Footer/Footer";
 import NextJsTopLoader from "@/components/Shared/NextJsTopLoader";
+import TawkToConfig from "@/components/Shared/Tawk_to_config";
+import { Toaster } from "sonner";
+import ReduxProvider from "@/provider/ReduxProvider";
 
 const Figtree = localFont({
   src: "../font/Figtree-Regular.ttf",
@@ -26,11 +29,17 @@ export default function RootLayout({
       <body
         className={`${Figtree.variable} antialiased`}
       >
+        <Toaster richColors />
         <NextJsTopLoader />
-        <Navbar />
-        {children}
-        <Footer />
+
+        <ReduxProvider>
+          <Navbar />
+          {children}
+          <Footer />
+        </ReduxProvider>
+
       </body>
+      {/* <TawkToConfig /> */}
     </html>
   );
 }

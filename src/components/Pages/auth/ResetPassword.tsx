@@ -35,22 +35,11 @@ const ResetPassword = () => {
             toast.success(res?.message || 'Password reset successfully');
             reset();
 
-            // dispatch(addUserDetails({
-            //     name: res?.data?.user?.name,
-            //     email: res?.data?.user?.email,
-            //     address: res?.data?.user?.address || '',
-            //     gender: res?.data?.user?.gender || '',
-            //     phoneNumber: res?.data?.user?.phoneNumber || '',
-            //     image: res?.data?.user?.image || '',
-            //     role: res?.data?.user?.role,
-            // }))
-
             router.push('/signin')
 
         } catch (err: any) {
             toast.error(err?.data?.message || 'Something went wrong, try again');
         }
-
     }
 
     return (

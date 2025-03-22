@@ -23,8 +23,6 @@ const VerifyOtpForm = () => {
         try {
             const res = await postVerify({ otp: Number(otp) }).unwrap();
 
-            toast.success(res?.message || 'Verify successfully');
-
             setCookie('accessToken', res?.accessToken, {
                 httpOnly: false,
                 maxAge: 14 * 24 * 60 * 60, // 14 days
@@ -32,6 +30,8 @@ const VerifyOtpForm = () => {
                 sameSite: 'lax',
                 secure: process.env.production === 'production',
             });
+
+            toast.success(res?.message || 'Verify successfully');
 
             navig.push(nextRout)
 

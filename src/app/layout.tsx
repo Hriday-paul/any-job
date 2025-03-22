@@ -4,7 +4,6 @@ import "./globals.css";
 import Navbar from "@/components/Shared/Navbar/Navbar";
 import Footer from "@/components/Shared/Footer/Footer";
 import NextJsTopLoader from "@/components/Shared/NextJsTopLoader";
-import TawkToConfig from "@/components/Shared/Tawk_to_config";
 import { Toaster } from "sonner";
 import ReduxProvider from "@/provider/ReduxProvider";
 

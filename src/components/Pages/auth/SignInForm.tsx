@@ -34,9 +34,6 @@ const SignInForm = () => {
         try {
             const res = await postSignIn(data).unwrap();
 
-            toast.success(res?.message || 'Signin successfully');
-            reset();
-
             setCookie('accessToken', res?.data?.accessToken, {
                 httpOnly: false,
                 maxAge: 14 * 24 * 60 * 60, // 14 days
@@ -56,6 +53,9 @@ const SignInForm = () => {
                 firstName: res?.data?.firstName,
                 profilePicture: res?.data?.profilePicture,
             }))
+
+            toast.success(res?.message || 'Signin successfully');
+            reset();
 
             router.push('/contructor')
 

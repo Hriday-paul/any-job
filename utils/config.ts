@@ -2,7 +2,7 @@
 const env = process.env.NEXT_PUBLIC_production as "production" | "dev";
 
 export const config = {
-//   serverBaseApi: process.env.BASE_API,
+  serverBaseApi: process.env.SERVER_BASE_API,
 
   clientBaseApi: process.env.NEXT_PUBLIC_BASE_API,
 

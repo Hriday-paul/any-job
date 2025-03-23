@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { useCookies } from 'react-cookie';
 import { useDispatch } from 'react-redux';
 import { addUserDetails } from '@/redux/slices/userSlice';
+import { config } from '../../../../utils/config';
 
 type signInType = {
     email: string,
@@ -35,18 +36,18 @@ const SignInForm = () => {
             const res = await postSignIn(data).unwrap();
 
             setCookie('accessToken', res?.data?.accessToken, {
-                httpOnly: false,
+                httpOnly: true,
                 maxAge: 14 * 24 * 60 * 60, // 14 days
                 path: '/',
                 sameSite: 'lax',
-                secure: process.env.production === 'production',
+                secure: config.hasSSL,
             });
             setCookie('refreshToken', res?.data?.refreshToken, {
-                httpOnly: false,
+                httpOnly: true,
                 maxAge: 30 * 24 * 60 * 60, // 30 days
                 path: '/',
                 sameSite: 'lax',
-                secure: process.env.production === 'production',
+                secure: config.hasSSL,
             });
 
             dispatch(addUserDetails({

@@ -61,11 +61,11 @@ const SignUpForm = () => {
             const res = await postUser({ formData: form }).unwrap();
 
             setCookie('token', res?.data?.token, {
-                httpOnly: config.hasSSL,
+                httpOnly: true,
                 // maxAge: (24 * (60 * 60)) * 30, // 30 days
                 path: '/',
                 sameSite: 'lax',
-                secure: config.env === 'production',
+                secure: config.hasSSL,
             });
 
             reset()

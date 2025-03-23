@@ -1,4 +1,5 @@
-import UseGetTerms from '@/Hooks/UseGetTerms';
+import UseGetAbout from '@/Hooks/UseGetAbout';
+import UseGetPrivacy from '@/Hooks/UseGetPrivacy';
 import { Metadata } from 'next';
 import React from 'react';
 
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 const page = async () => {
-    const privacy = await UseGetTerms() as {
+    const privacy = await UseGetPrivacy() as {
         "data": {
             "_id": "678e1c02bb7cae0b77e1cd1f",
             "content": "gfskvguifguidsfhgildfhgieihgop",

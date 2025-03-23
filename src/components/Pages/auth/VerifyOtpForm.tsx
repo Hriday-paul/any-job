@@ -24,11 +24,11 @@ const VerifyOtpForm = () => {
             const res = await postVerify({ otp: Number(otp) }).unwrap();
 
             setCookie('accessToken', res?.accessToken, {
-                httpOnly: false,
+                httpOnly: true,
                 maxAge: 14 * 24 * 60 * 60, // 14 days
                 path: '/',
                 sameSite: 'lax',
-                secure: process.env.production === 'production',
+                secure: config.hasSSL,
             });
 
             toast.success(res?.message || 'Verify successfully');

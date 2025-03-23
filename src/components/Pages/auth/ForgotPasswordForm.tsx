@@ -32,11 +32,11 @@ const ForgotPasswordForm = () => {
             reset();
 
             setCookie('token', res?.data?.token, {
-                httpOnly: config.hasSSL,
+                httpOnly: true,
                 // maxAge: 14 * 24 * 60 * 60, // 14 days
                 path: '/',
                 sameSite: 'lax',
-                secure: config.env === 'production',
+                secure: config.hasSSL,
             });
 
             router.push('/verify-otp?next=/reset-password')

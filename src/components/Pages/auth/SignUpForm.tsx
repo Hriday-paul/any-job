@@ -145,7 +145,12 @@ const SignUpForm = () => {
                         <input
                             type="text"
                             id='email'
-                            {...register("email", { required: true })}
+                            {...register("email", {
+                                required: true,
+                                pattern: {
+                                    value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, message: 'email invalid'
+                                }
+                            })}
                             placeholder="Enter your Email address"
                             className={`w-full rounded-md border bg-zinc-100  py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.email ? 'border-danger' : 'dark:text-white border-stroke '}`}
                         />

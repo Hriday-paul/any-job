@@ -92,10 +92,11 @@ const baseApi = createApi({
             "firstName": string,
             "lastName"?: string,
             "email": string,
-            "description": string
+            "message": string,
+            subject ?: string
         }>({
             query: (data) => ({
-                url: '/contact/create-contact',
+                url: '/settings/send-email',
                 method: 'POST',
                 body: data,
             }),

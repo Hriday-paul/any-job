@@ -1,7 +1,9 @@
 "use client"
+import { useAdmin_supportMutation } from '@/redux/api/baseApi';
 import React from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { ImSpinner2 } from 'react-icons/im';
+import { toast } from 'sonner';
 
 export type dellerInputType = {
     first_name: string,
@@ -11,6 +13,8 @@ export type dellerInputType = {
 }
 const ContactForm = () => {
 
+    const [sendMail, { isLoading }] = useAdmin_supportMutation()
+
     const {
         register,
         handleSubmit,
@@ -19,10 +23,15 @@ const ContactForm = () => {
     } = useForm<dellerInputType>();
 
     const handleFormSubmit: SubmitHandler<dellerInputType> = async (data) => {
-
+        
+        try {
+            const res = await sendMail({ firstName: data?.first_name, lastName: data?.last_name, email: data?.email, message: data?.message, subject: "Support message from AnyJob" })
+            toast.success(res?.data?.message || "Message send successfully, get reply with your email")
+            reset();
+        } catch (err: any) {
+            toast.error(err?.data?.message || "Something went wrong, try again")
+        }
     }
-
-    const isLoading = false;
 
     return (
         <form onSubmit={handleSubmit(handleFormSubmit)} className='my-3'>

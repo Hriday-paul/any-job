@@ -23,7 +23,7 @@ const VerifyOtpForm = () => {
         try {
             const res = await postVerify({ otp: Number(otp) }).unwrap();
 
-            setCookie('accessToken', res?.accessToken, {
+            setCookie('accessToken', res?.data?.accessToken, {
                 httpOnly: false,
                 maxAge: 14 * 24 * 60 * 60, // 14 days
                 path: '/',

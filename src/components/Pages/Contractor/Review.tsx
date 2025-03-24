@@ -1,6 +1,7 @@
 import React from 'react';
 import { Rating, Star } from '@smastrom/react-rating';
 import { reviewsType } from '@/redux/types';
+import '@smastrom/react-rating/style.css';
 
 const Review = ({ review }: { review: reviewsType }) => {
     return (
@@ -10,9 +11,9 @@ const Review = ({ review }: { review: reviewsType }) => {
                 <section>
                     <div className='flex flex-row gap-x-1.5 items-center'>
                         <Rating
-                            value={3}
+                            value={review?.rating}
                             readOnly={true}
-                            style={{ maxWidth: 80 }}
+                            style={{ maxWidth: 90 }}
                             items={5}
                             transition="zoom"
                             itemStyles={{
@@ -25,6 +26,8 @@ const Review = ({ review }: { review: reviewsType }) => {
                     </div>
                 </section>
             </div>
+
+
             <p className="text-base font-figtree font-medium text-gray-600 mt-2">
                 {review?.comment}
             </p>

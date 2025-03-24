@@ -28,7 +28,7 @@ const page = async () => {
                     dangerouslySetInnerHTML={{
                         __html: privacy?.data?.content || "",
                     }}
-                    className="break-words"
+                    className="font-figtree"
                 ></div>
             </div>
         </div>

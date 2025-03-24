@@ -8,11 +8,11 @@ import ProfileSkeleton from '@/components/Skeletons/ProfileSkeleton';
 import ErrorComponent from '@/components/Shared/ErrorComponent';
 
 const ContructorProfie = () => {
-    const { isLoading, isSuccess, isError, data } = useGetUserProfileQuery()
+    const { isLoading, isFetching, isSuccess, isError, data } = useGetUserProfileQuery()
     return (
         <div>
             {
-                isLoading ? <ProfileSkeleton /> : isSuccess ? <div className="bg-white py-6">
+                (isLoading || isFetching) ? <ProfileSkeleton /> : isSuccess ? <div className="bg-white py-6">
                     {/* Header Section */}
                     <ProfileHeader isEditable={true} profileData={data?.data} />
 

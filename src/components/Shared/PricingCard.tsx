@@ -42,7 +42,7 @@ const PricingCard = ({ packag }: { packag: packageType }) => {
             {/* Header */}
             <div className="mb-6">
                 <h2 className="text-2xl font-semibold text-primary_red text-center">{packag?.name}</h2>
-                <p className="text-gray-400 mt-1 text-center">{packag?.description}</p>
+                {/* <p className="text-gray-400 mt-1 text-center">{packag?.description}</p> */}
             </div>
 
             {/* Price */}
@@ -52,7 +52,7 @@ const PricingCard = ({ packag }: { packag: packageType }) => {
             </div>
 
             {/* Features */}
-            <div className="space-y-4 mb-8">
+            {/* <div className="space-y-4 mb-8">
                 {[
                     "Perfect for new contractors testing the platform",
                     "Access up to 5 quotes per month",
@@ -66,7 +66,9 @@ const PricingCard = ({ packag }: { packag: packageType }) => {
                         <span className="text-gray-700">{feature}</span>
                     </div>
                 ))}
-            </div>
+            </div> */}
+
+            <p className="text-gray-600 mt-1 text-center mb-8">{packag?.description}</p>
 
             {/* Subscribe Button */}
             <center>

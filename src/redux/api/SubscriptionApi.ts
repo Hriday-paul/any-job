@@ -18,7 +18,7 @@ const SubscriptionApi = baseApi.injectEndpoints({
             }),
         }),
 
-        currentSubscription: builder.query<{ message: string, data: currentSubscriptionType, success: boolean }, void>({
+        currentSubscription: builder.query<{ message: string, data: currentSubscriptionType | null, success: boolean }, void>({
             query: () => ({
                 url: '/subscription/current',
                 method: 'GET',

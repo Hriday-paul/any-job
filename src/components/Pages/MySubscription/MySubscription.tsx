@@ -11,6 +11,8 @@ import { HiArrowUpRight } from 'react-icons/hi2';
 const MySubscription = () => {
     const { isLoading, isError, isSuccess, data } = useCurrentSubscriptionQuery();
 
+    console.log(data?.data)
+
     return (
         <div className='container'>
 
@@ -23,17 +25,17 @@ const MySubscription = () => {
                         </div>
                         :
                         isSuccess ?
-                            <div className=''> {
+                            data?.data == null ? <h3 className='text-base md:text-lg  lg:text-xl text-center font-figtree font-semibold py-8 text-primary_red'>You have not any running subscription</h3> : <div className=''> {
                                 <div className="bg-white rounded-2xl shadow-lg p-8 w-full font-figtree border border-stroke max-w-lg mx-auto">
                                     {/* Header */}
                                     <div className="mb-6">
                                         <h2 className="text-2xl font-semibold text-primary_red text-center">{data?.data?.package?.name}</h2>
-                                        <p className="text-gray-400 mt-1 text-center">{data?.data?.package?.description}</p>
+                                        {/* <p className="text-gray-400 mt-1 text-center">{data?.data?.package?.description}</p> */}
                                     </div>
 
                                     {/* Price */}
                                     <div className="bg-red-50/50 shadow rounded-xl p-4 text-center mb-8">
-                                        <span className="text-primary_red text-3xl font-bold font-figtree">${data?.data?.package?.price}</span>
+                                        <span className="text-primary_red text-3xl font-bold font-figtree">${data?.data?.package?.price || 0}</span>
                                         <span className="text-primary_red font-figtree">/{data?.data?.package?.interval}</span>
                                     </div>
 

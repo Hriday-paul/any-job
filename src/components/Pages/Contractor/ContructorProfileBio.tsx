@@ -18,7 +18,7 @@ const ContructorProfileBio = ({ profileData }: { profileData: userResType }) => 
         return (ratingCount / length) * 100;
     }
 
-    console.log(profileData?.myServices[0])
+   
 
     return (
         <div className='space-y-8 mt-5 md:mt-8'>

@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import React from 'react';
-import userImage from '../../../../public/quotes/user.jpeg'
+import userImage from '../../../../public/empty-profile-photo.jpg'
 import { Clock, Mail, MapPin, Phone, Star } from 'lucide-react';
 import Link from 'next/link';
 import { userResType } from '@/redux/types';

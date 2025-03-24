@@ -5,11 +5,6 @@ const page = () => {
 
     notFound();
     
-    return (
-        <div className='container'>
-            
-        </div>
-    );
 };
 
 export default page;

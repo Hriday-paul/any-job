@@ -18,6 +18,8 @@ import JobDetailsModal from "./JobDetailsModal";
 import { myjobsType } from "@/redux/types";
 import QuotesPreview from "./QuotesPreview";
 import moment from "moment";
+import Image from "next/image";
+import emptyDataImg from '../../../../public/empty_data.jpg'
 
 function MyJobTable({ data }: { data: myjobsType[] }) {
     return (
@@ -37,7 +39,7 @@ function MyJobTable({ data }: { data: myjobsType[] }) {
                     </TableRow>
                 </TableHeader>
                 <TableBody className="border border-stroke">
-                    {data.map((job) => (
+                    {data?.map((job) => (
 
                         <TableRow key={job?.id}>
                             <TableCell className="font-medium p-5">{job?.job?.firstName + " " + job?.job?.lastName}</TableCell>
@@ -97,7 +99,13 @@ function MyJobTable({ data }: { data: myjobsType[] }) {
                 </TableBody>
 
             </Table>
-        </div>
+            {
+                data?.length <= 0 && <section className='min-h-[calc(25vh)] flex flex-col items-center justify-center'>
+                    <Image src={emptyDataImg} className='h-28 w-auto mx-auto' alt='empty data' />
+                    <h5 className='text-base font-figtree text-center'>Data is empty</h5>
+                </section>
+            }
+        </div >
     )
 }
 

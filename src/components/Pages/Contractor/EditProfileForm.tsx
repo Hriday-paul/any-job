@@ -138,8 +138,6 @@ const EditProfileForm = () => {
         }
     }, [isSuccess, data])
 
-    console.log(selectedArea)
-
     return (
 
         <form onSubmit={handleSubmit(handleFormSubmit)} className='bg-[#fff9f9] p-5 md:p-8 max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] relative -mt-8 md:-mt-10 lg:-mt-24 z-20 mb-20 rounded-xl'>
@@ -149,20 +147,17 @@ const EditProfileForm = () => {
                     <ImSpinner8 className="text-4xl text-primary_red animate-spin" />
                 </div> : isError ? <ErrorComponent /> : isSuccess ?
 
-
                     <div>
 
-                        <div>
-                            <div className='flex flex-col justify-center items-center relative w-40 h-40 mx-auto'>
-                                <Image src={profileImg ? URL.createObjectURL(profileImg) : (data?.data?.profilePicture || '/empty-profile-photo.jpg')} alt={'user photo'} fill className='rounded-full mx-auto object-cover' />
+                        <div className='flex flex-col justify-center items-center relative w-40 h-40 mx-auto'>
+                            <Image src={profileImg ? URL.createObjectURL(profileImg) : (data?.data?.profilePicture || '/empty-profile-photo.jpg')} alt={'user photo'} fill className='rounded-full mx-auto object-cover' />
 
-                                <label htmlFor="chosePhoto" className='p-3 bg-primary text-secondary mx-auto font-poppins mt-3 cursor-pointer text-sm bg-white z-20 bg-opacity-80 rounded-full'>
-                                    <MdOutlineAddPhotoAlternate className='' />
-                                </label>
+                            <label htmlFor="chosePhoto" className='p-3 bg-primary text-secondary mx-auto font-poppins mt-3 cursor-pointer text-sm bg-white z-20 bg-opacity-80 rounded-full'>
+                                <MdOutlineAddPhotoAlternate className='' />
+                            </label>
 
-                                <input onChange={fileonChange} multiple={false} type="file" name="chosePhoto" id="chosePhoto" className='hidden' />
+                            <input onChange={fileonChange} multiple={false} type="file" name="chosePhoto" id="chosePhoto" className='hidden' />
 
-                            </div>
                         </div>
 
                         <div className='flex items-center gap-x-2 py-3 lg:py-4'>

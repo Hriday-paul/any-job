@@ -61,7 +61,7 @@ const SignUpForm = () => {
             const res = await postUser({ formData: form }).unwrap();
 
             setCookie('token', res?.data?.token, {
-                httpOnly: true,
+                httpOnly: false,
                 // maxAge: (24 * (60 * 60)) * 30, // 30 days
                 path: '/',
                 sameSite: 'lax',

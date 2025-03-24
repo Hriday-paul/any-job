@@ -36,14 +36,14 @@ const SignInForm = () => {
             const res = await postSignIn(data).unwrap();
 
             setCookie('accessToken', res?.data?.accessToken, {
-                httpOnly: true,
+                httpOnly: false,
                 maxAge: 14 * 24 * 60 * 60, // 14 days
                 path: '/',
                 sameSite: 'lax',
                 secure: config.hasSSL,
             });
             setCookie('refreshToken', res?.data?.refreshToken, {
-                httpOnly: true,
+                httpOnly: false,
                 maxAge: 30 * 24 * 60 * 60, // 30 days
                 path: '/',
                 sameSite: 'lax',

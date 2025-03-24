@@ -32,7 +32,7 @@ const ForgotPasswordForm = () => {
             reset();
 
             setCookie('token', res?.data?.token, {
-                httpOnly: true,
+                httpOnly: false,
                 // maxAge: 14 * 24 * 60 * 60, // 14 days
                 path: '/',
                 sameSite: 'lax',

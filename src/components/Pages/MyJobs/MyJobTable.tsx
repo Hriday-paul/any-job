@@ -52,7 +52,7 @@ function MyJobTable({ data }: { data: myjobsType[] }) {
                                 {job?.status == 'COMPLETED' ? <span className="bg-success/20 text-success px-2.5 py-1 rounded-full">Accepted</span> : <span className="bg-black/20 text-black px-2.5 py-1 rounded-full text-sm">In pregress</span>}
                             </TableCell>
                             <TableCell>
-                                {!job?.paymentStatus ? <span className="text-primary_red">Unpaid</span> : <span className="text-success">Paid</span>}
+                                {job?.paymentStatus == "UNPAID" ? <span className="text-primary_red">Unpaid</span> : <span className="text-success">Paid</span>}
                             </TableCell>
                             <TableCell className="text-right p-5">
 

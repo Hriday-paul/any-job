@@ -43,6 +43,9 @@ const baseQueryWithReauth: typeof baseQuery = async (
                 {
                     url: "/auth/refresh-token",
                     method: "GET",
+                    headers: {
+                        token: refreshToken
+                    },
                     body: { refreshToken: refreshToken },
                 },
                 api,
@@ -93,7 +96,7 @@ const baseApi = createApi({
             "lastName"?: string,
             "email": string,
             "message": string,
-            subject ?: string
+            subject?: string
         }>({
             query: (data) => ({
                 url: '/settings/send-email',

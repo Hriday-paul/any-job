@@ -58,7 +58,7 @@ const PasswordInput = <T extends Record<string, any>>({
                 </div>
             </div>
             {errors?.[name] && (
-                <p className="text-red-500 text-sm col-span-2">{errors?.[name]?.message as string}</p>
+                <p className="text-red-500 text-sm col-span-2 font-figtree">{errors?.[name]?.message as string}</p>
             )}
         </div>
     );

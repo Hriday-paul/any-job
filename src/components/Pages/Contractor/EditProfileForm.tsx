@@ -2,8 +2,7 @@
 import Image from 'next/image';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import userImage from '../../../../public/quotes/user.jpeg'
-import { MdDeleteOutline, MdOutlineAddPhotoAlternate } from 'react-icons/md';
+import { MdOutlineAddPhotoAlternate } from 'react-icons/md';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import MultipleSelect from '@/components/Shared/MultiSelect';
 import userIcon from '../../../../public/user.png'
@@ -11,7 +10,6 @@ import locationIcon from '../../../../public/location.png'
 import serviceIcon from '../../../../public/service.png'
 import coinIcon from '../../../../public/coin_frame.png'
 import workIcon from '../../../../public/work.png'
-import MapWithDrawing from '@/components/Shared/MapWithDrawing';
 import { useServicesQuery } from '@/redux/api/serviceApi';
 import { useGetUserProfileQuery, useUpdateProfileMutation } from '@/redux/api/authApi';
 import ErrorComponent from '@/components/Shared/ErrorComponent';
@@ -19,6 +17,7 @@ import { ImSpinner2, ImSpinner8 } from 'react-icons/im';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import FilesManager from './FilesManager';
+import { counties } from '../../../../utils/default';
 
 export type editProfileType = {
     firstName: string,
@@ -32,8 +31,9 @@ export type editProfileType = {
     // town: string;
     userServices: string[],
     minPricing: string,
-    availability: string,
-    location?: { latitude: number, longitude: number }[][]
+    // availability: string,
+    location?: { latitude: number, longitude: number }[][],
+    serviceAreas: string[]
 }
 
 const EditProfileForm = () => {
@@ -42,8 +42,6 @@ const EditProfileForm = () => {
     const [postUpdate, { isLoading: updateLoading }] = useUpdateProfileMutation();
     const [servicePhotos, setServicePhotos] = useState<File[]>([]);
     const [profileImg, setProfileImg] = useState<File | null>(null);
-    const [selectedArea, setSelectedArea] = useState<{ latitude: number, longitude: number }[][]>([]);
-    const [defaultSelectedArea, setDefaultSelectedArea] = useState<{ latitude: number, longitude: number }[][]>([]);
 
     const {
         register,
@@ -88,18 +86,10 @@ const EditProfileForm = () => {
             ...data?.data?.myServices?.filter(dfserv => !fData?.userServices?.includes(dfserv?.service?.name))?.map(item => { return { isDelete: true, id: item?.service?.id } }) ?? []
         ]
 
-        // --------------set locations path if select a new Area--------------
-        if (selectedArea?.length > 0) {
-            fData.location = [
-                ...selectedArea,
-                ...(defaultSelectedArea?.length > 0 ? defaultSelectedArea : [])
-            ];
-        }
-
         try {
             const form = new FormData();
 
-            form.append("data", JSON.stringify({ ...fData, userServices: finalServices }))
+            form.append("data", JSON.stringify({ ...fData, availability : "Available", userServices: finalServices }))
 
             if (profileImg) {
                 form.append('profilePicture', profileImg)
@@ -129,12 +119,11 @@ const EditProfileForm = () => {
                 experience: data?.data?.experience || "",
                 bio: data?.data?.bio || '',
                 whyChooseMe: data?.data?.whyChooseMe || '',
-                availability: data?.data?.availability || '',
+                // availability: data?.data?.availability || '',
                 minPricing: data?.data?.minPricing?.toString() || '',
                 userServices: data?.data?.myServices?.map(s => s?.service?.name) || [],
+                serviceAreas: data?.data?.serviceAreas || []
             })
-            // setSelectedArea(data?.data?.locationPaths[0]?.paths)
-            setDefaultSelectedArea(data?.data?.locationPaths[0]?.paths)
         }
     }, [isSuccess, data])
 
@@ -252,41 +241,6 @@ const EditProfileForm = () => {
                             {errors?.address && <p className="text-red-500 text-sm col-span-2">{errors?.address?.message}</p>}
                         </div>
 
-
-                        {/* ------------------------county------------------ */}
-                        {/* <div className="w-full mx-auto mb-3">
-                <label htmlFor='brand' className="mb-1.5 block text-black dark:text-white font-figtree">
-                    County
-                    <span className="text-red-500 text-base ml-1">*</span>
-                </label>
-                <Controller
-                    name={'county'}
-                    control={control}
-                    rules={{
-                        required: true,
-                    }}
-                    render={({ field }) => (
-                        <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                        >
-                            <SelectTrigger className={`bg-form px-4 py-3 rounded-md  text-sm font-figtree w-full text-primary bg-secondary border shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] ${errors?.county ? "font-medium  border-danger" : "border-stroke"}`}>
-                                <SelectValue placeholder={"County"} />
-                            </SelectTrigger>
-                            <SelectContent className="rounded-sm text-sm font-figtree bg-form">
-                                {
-                                    counties?.map(item => {
-                                        return <SelectItem key={item} value={item} className="h-10 font-figtree text-base font-medium hover:!bg-white">{item}</SelectItem>
-                                    })
-                                }
-                            </SelectContent>
-                        </Select>
-                    )} >
-
-                </Controller>
-                {errors?.county && <p className="text-red-500 text-sm col-span-2">{errors?.county?.message}</p>}
-            </div> */}
-
                         {/* ------------------town/city----------------- */}
                         {/* <div className="w-full mx-auto mb-3">
                 <label htmlFor='town' className="mb-1.5 block text-black dark:text-white font-figtree">
@@ -359,24 +313,29 @@ const EditProfileForm = () => {
                             <h5 className='text-lg lg:text-xl font-extrabold text-black font-figtree'>Location</h5>
                         </div>
 
+                        {/* ------------------------county------------------ */}
 
-                        {/* --------------------location map---------------- */}
-                        <div className="w-full mx-auto mb-3">
-                            <label htmlFor='location' className="mb-1.5 block text-black dark:text-white font-figtree">
-                                Choose the areas where you can provide your service?
-                                {/* <span className="text-red-500 text-base ml-1">*</span> */}
+                        <div className='w-full mx-auto mb-3'>
+                            <label htmlFor='State' className="mb-1.5 block text-black font-medium dark:text-white font-figtree">
+                                Service County/State
+                                <span className="text-red-500 text-base ml-1">*</span>
                             </label>
-
-                            <div className=''>
-                                <MapWithDrawing height='300px' defaultSelectedArea={data?.data?.locationPaths[0]?.paths} selectedArea={selectedArea} setSelectedArea={setSelectedArea} />
+                            <div className='shadow-[0_4px_18px_0_rgba(0,0,0,0.09)]'>
+                                <MultipleSelect
+                                    name='serviceAreas'
+                                    items={counties?.map(service => {
+                                        return { label: service, value: service }
+                                    })}
+                                    isLoading={false}
+                                    control={control}
+                                    errors={errors}
+                                    placeholder='Select Service County'
+                                    validationRules={{
+                                        required: "Select minimum 1 county",
+                                    }}
+                                />
                             </div>
-
-                            <button type='button' className='border border-stroke rounded text-xs text-gray-700 font-figtree px-2 py-1 mt-2 float-end bg-slate-50 hover:bg-slate-100 duration-200' onClick={() => {
-                                setSelectedArea([])
-                                setDefaultSelectedArea([])
-                            }} >
-                                Clear
-                            </button>
+                            {errors?.serviceAreas && <p className="text-red-500 text-sm col-span-2">{errors?.serviceAreas?.message}</p>}
                         </div>
 
 
@@ -430,7 +389,7 @@ const EditProfileForm = () => {
                         </div>
 
                         {/* ------------availability------------ */}
-                        <div className="w-full mx-auto mb-3">
+                        {/* <div className="w-full mx-auto mb-3">
                             <label htmlFor='Availability Status' className="mb-1.5 block text-black dark:text-white font-figtree">
                                 Availability Status
                                 <span className="text-red-500 text-base ml-1">*</span>
@@ -461,7 +420,7 @@ const EditProfileForm = () => {
 
                             </Controller>
                             {errors?.availability && <p className="text-red-500 text-sm col-span-2">{errors?.availability?.message}</p>}
-                        </div>
+                        </div> */}
 
                         <div className='flex items-center gap-x-2 py-3 lg:py-4'>
                             <Image src={workIcon} placeholder='blur' className='w-auto h-5 lg:h-7 object-cover' alt="any job details icon" />

@@ -13,9 +13,11 @@ const MyJobsRoot = () => {
 
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>('');
 
-    const [status, setStatus] = useState('')
+    const [status, setStatus] = useState<any>(false);
 
-    const query: { startDate?: Date, endDate?: Date, searchTerm?: string, status?: string } = {};
+    const [page, setPage] = useState<number>(1);
+
+    const query: { startDate?: Date, endDate?: Date, searchTerm?: string, status?: string, page: number, isComplete?: boolean } = { page: page, status: "APPROVED" };
 
     if (date) {
         query["startDate"] = date?.from;
@@ -25,10 +27,12 @@ const MyJobsRoot = () => {
         query["searchTerm"] = debouncedSearchTerm;
     }
     if (status) {
-        if (status !== 'all') query["status"] = status;
+        if (status !== 'all') query["isComplete"] = status;
     }
 
     const { isLoading, isSuccess, data, isError } = useMyJobsQuery(query);
+
+    
 
     return (
         <div>
@@ -42,7 +46,7 @@ const MyJobsRoot = () => {
                         </div>
                     </div>
                     :
-                    isSuccess ? <MyJobTable data={data?.data} /> : isError ? <ErrorComponent /> : <></>
+                    isSuccess ? <MyJobTable data={data?.data} totalPage={data?.meta?.totalPage} setPage={setPage} /> : isError ? <ErrorComponent /> : <></>
             }
 
         </div>

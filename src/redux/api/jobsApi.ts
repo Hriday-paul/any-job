@@ -42,12 +42,21 @@ const jobsApi = baseApi.injectEndpoints({
             invalidatesTags: ['jobs']
         }),
 
-        MyJobs: builder.query<{ message: string, success: boolean, data: myjobsType[] }, any>({
+        MyJobs: builder.query<{ message: string, success: boolean, data: myjobsType[], meta: { totalPage: number } }, any>({
             query: (query) => ({
                 url: `/quote/my-quotes-as-contractor`,
                 method: 'GET',
                 params: query
             })
+        }),
+
+        jobStatusUpdate: builder.mutation<{ message: string, success: boolean }, { id: string, data: any }>({
+            query: ({ id, data }) => ({
+                url: `/quote/${id}`,
+                method: 'PATCH',
+                body: data
+            }),
+
         }),
 
         quotesByJob: builder.query<{ message: string, success: boolean, data: myjobsType[] }, { token: string }>({
@@ -57,8 +66,8 @@ const jobsApi = baseApi.injectEndpoints({
             })
         }),
 
-        acceptQuote: builder.mutation<{ message: string, success: boolean, data : string }, {id : string}>({
-            query: ({id}) => ({
+        acceptQuote: builder.mutation<{ message: string, success: boolean, data: string }, { id: string }>({
+            query: ({ id }) => ({
                 url: `/quote/make-payment/${id}`,
                 method: 'POST',
             }),
@@ -68,4 +77,4 @@ const jobsApi = baseApi.injectEndpoints({
     })
 })
 
-export const { usePostJobMutation, useMyNearestJobsQuery, useSendQuoteMutation, useGetAddreessByGoogleQuery, useMyJobsQuery, useQuotesByJobQuery, useAcceptQuoteMutation } = jobsApi;
+export const { usePostJobMutation, useMyNearestJobsQuery, useSendQuoteMutation, useGetAddreessByGoogleQuery, useMyJobsQuery, useQuotesByJobQuery, useAcceptQuoteMutation, useJobStatusUpdateMutation } = jobsApi;

@@ -19,12 +19,24 @@ const contructorRouts = [
     },
     {
         id: 2,
-        name: "View My Job",
+        name: "Live Jobs",
+        icon: <CiViewTimeline className='text-sm md:text-base' />,
+        rout: "/contructor/jobs"
+    },
+    {
+        id: 3,
+        name: "Quotes",
+        icon: <CiViewTimeline className='text-sm md:text-base' />,
+        rout: "/contructor/quotes"
+    },
+    {
+        id: 5,
+        name: "My Clients",
         icon: <CiViewTimeline className='text-sm md:text-base' />,
         rout: "/contructor/myjobs"
     },
     {
-        id: 3,
+        id: 4,
         name: "Setting",
         icon: <IoMdSettings className='text-sm md:text-base' />,
         rout: "/contructor/setting"
@@ -57,12 +69,17 @@ const ContructorBanner = () => {
                                 </Link>
                             })
                         }
-                        <button onClick={handleLogout} className={`rounded-lg p-2.5 md:p-3.5 lg:p-4 bg-white`}>
-                            <span className='flex flex-row gap-x-2 items-center font-figtree font-medium'>
-                                <LuLogOut className='text-sm md:text-base rotate-180' />
-                                <p className='font-figtree text-sm md:text-base'>Logout</p>
-                            </span>
-                        </button>
+
+                        {/* <div className='col-span-2 flex justify-center '> */}
+                            <button onClick={handleLogout} className={`w-full rounded-lg p-2.5 md:p-3.5 lg:p-4 bg-white`}>
+                                <span className='flex flex-row gap-x-2 items-center font-figtree font-medium'>
+                                    <LuLogOut className='text-sm md:text-base rotate-180' />
+                                    <p className='font-figtree text-sm md:text-base'>Logout</p>
+                                </span>
+                            </button>
+                        {/* </div> */}
+
+
                     </div>
 
                 </div>

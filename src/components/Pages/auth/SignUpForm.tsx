@@ -3,16 +3,17 @@ import PasswordInput from '@/components/Shared/PasswordInput';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import React from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { ImSpinner2 } from 'react-icons/im';
 import { motion } from "motion/react"
 import MultipleSelect from '@/components/Shared/MultiSelect';
-import { services } from '../../../../utils/default';
+import { counties, services } from '../../../../utils/default';
 import { useRegisterUserMutation } from '@/redux/api/authApi';
 import { useCookies } from 'react-cookie';
 import { toast } from 'sonner';
 import { config } from '../../../../utils/config';
 import { useServicesQuery } from '@/redux/api/serviceApi';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type signUpType = {
     firstName: string,
@@ -21,7 +22,12 @@ type signUpType = {
     userServices: string[]
     password: string,
     confirmPassword: string,
-    terms: boolean
+    terms: boolean,
+
+    country: string,
+    serviceAreas: string[],
+    // city: string,
+    // zipCode: string,
 }
 
 const SignUpForm = () => {
@@ -51,7 +57,8 @@ const SignUpForm = () => {
                 lastName: data?.lastName,
                 email: data?.email,
                 userServices: data?.userServices,
-                password: data?.password
+                password: data?.password,
+                serviceAreas : data?.serviceAreas
             }
 
             const form = new FormData();
@@ -72,7 +79,7 @@ const SignUpForm = () => {
 
             toast.success(res?.message || 'Signup successfully');
 
-            router.push('/verify-otp?next=/location')
+            router.push('/verify-otp?next=/pricing')
 
         } catch (err: any) {
             toast.error(err?.data?.message || 'Something went wrong, try again');
@@ -104,36 +111,38 @@ const SignUpForm = () => {
 
                 <form onSubmit={handleSubmit(handleFormSubmit)} className=''>
 
-                    {/* -----------------first name-------------- */}
-                    <div className="w-full mx-auto mb-4">
-                        <label htmlFor='firstname' className="mb-1.5 block text-black font-medium dark:text-white font-figtree">
-                            First Name
-                            <span className="text-red-500 text-base ml-1">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            id='firstname'
-                            {...register("firstName", { required: true })}
-                            placeholder="Enter your first Name"
-                            className={`w-full rounded-md border bg-zinc-100  py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.firstName ? 'border-danger' : 'dark:text-white border-stroke '}`}
-                        />
-                        {errors?.firstName && <p className="text-red-500 text-sm col-span-2">{errors?.firstName?.message}</p>}
-                    </div>
+                    <div className='flex flex-row gap-x-3 mb-4'>
+                        {/* -----------------first name-------------- */}
+                        <div className="w-full mx-auto">
+                            <label htmlFor='firstname' className="mb-1.5 block text-black font-medium dark:text-white font-figtree">
+                                First Name
+                                <span className="text-red-500 text-base ml-1">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id='firstname'
+                                {...register("firstName", { required: true })}
+                                placeholder="Enter your first Name"
+                                className={`w-full rounded-md border bg-zinc-100  py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.firstName ? 'border-danger' : 'dark:text-white border-stroke '}`}
+                            />
+                            {errors?.firstName && <p className="text-red-500 text-sm col-span-2 font-figtree">{errors?.firstName?.message}</p>}
+                        </div>
 
-                    {/* -----------------last name-------------- */}
-                    <div className="w-full mx-auto mb-4">
-                        <label htmlFor='lastname' className="mb-1.5 block text-black font-medium dark:text-white font-figtree">
-                            Last Name
-                            <span className="text-red-500 text-base ml-1">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            id='lastname'
-                            {...register("lastName", { required: true })}
-                            placeholder="Enter your last Name"
-                            className={`w-full rounded-md border bg-zinc-100  py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.lastName ? 'border-danger' : 'dark:text-white border-stroke '}`}
-                        />
-                        {errors?.lastName && <p className="text-red-500 text-sm col-span-2">{errors?.lastName?.message}</p>}
+                        {/* -----------------last name-------------- */}
+                        <div className="w-full mx-auto">
+                            <label htmlFor='lastname' className="mb-1.5 block text-black font-medium dark:text-white font-figtree">
+                                Last Name
+                                <span className="text-red-500 text-base ml-1">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id='lastname'
+                                {...register("lastName", { required: true })}
+                                placeholder="Enter your last Name"
+                                className={`w-full rounded-md border bg-zinc-100  py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.lastName ? 'border-danger' : 'dark:text-white border-stroke '}`}
+                            />
+                            {errors?.lastName && <p className="text-red-500 text-sm col-span-2 font-figtree">{errors?.lastName?.message}</p>}
+                        </div>
                     </div>
 
                     {/* -----------------email-------------- */}
@@ -154,8 +163,92 @@ const SignUpForm = () => {
                             placeholder="Enter your Email address"
                             className={`w-full rounded-md border bg-zinc-100  py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.email ? 'border-danger' : 'dark:text-white border-stroke '}`}
                         />
-                        {errors?.email && <p className="text-red-500 text-sm col-span-2">{errors?.email?.message}</p>}
+                        {errors?.email && <p className="text-red-500 text-sm col-span-2 font-figtree">{errors?.email?.message}</p>}
                     </div>
+
+                    {/* ------------------------county------------------ */}
+                    <div className="w-full mx-auto mb-4">
+                        <label htmlFor='state' className="mb-1.5 block text-black dark:text-white font-figtree">
+                            Service County/State
+                            <span className="text-red-500 text-base ml-1">*</span>
+                        </label>
+                        {/* <Controller
+                            name={'state'}
+                            control={control}
+                            rules={{
+                                required: true,
+                            }}
+                            render={({ field }) => (
+                                <Select
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value}
+                                >
+                                    <SelectTrigger className={`!bg-zinc-100 py-2.5 px-4 rounded-md  text-sm font-figtree w-full text-primary bg-secondary border ${errors?.state ? "font-medium  border-danger" : "border-stroke"}`}>
+                                        <SelectValue placeholder={"County"} />
+                                    </SelectTrigger>
+                                    <SelectContent className="rounded-sm text-sm font-figtree ">
+                                        {
+                                            counties?.map(item => {
+                                                return <SelectItem key={item} value={item} className="h-10 font-figtree text-base font-medium hover:bg-gray-100">{item}</SelectItem>
+                                            })
+                                        }
+                                    </SelectContent>
+                                </Select>
+                            )} >
+
+                        </Controller> */}
+
+                        <MultipleSelect
+                            name='serviceAreas'
+                            items={counties?.map(service => {
+                                return { label: service, value: service }
+                            })}
+                            isLoading={false}
+                            control={control}
+                            errors={errors}
+                            placeholder='Select Service County'
+                            validationRules={{
+                                required: "Select minimum 1 county",
+                            }}
+                        />
+                        {errors?.serviceAreas && <p className="text-red-500 text-sm col-span-2 font-figtree">{errors?.serviceAreas?.message}</p>}
+                    </div>
+
+
+                    {/* ---------------------city & post code------------------- */}
+                    {/* <div className='flex flex-row gap-x-3 items-center mb-4'>
+                        
+                        <div className="w-full mx-auto">
+                            <label htmlFor='city' className="mb-1.5 block text-black font-medium dark:text-white font-figtree">
+                                City/Town
+                                <span className="text-red-500 text-base ml-1">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id='city'
+                                {...register("city")}
+                                placeholder="Enter Your City"
+                                className={`w-full rounded-md border bg-zinc-100  py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.city ? 'border-danger' : 'dark:text-white border-stroke '}`}
+                            />
+                            {errors?.city && <p className="text-red-500 text-sm col-span-2 font-figtree">{errors?.city?.message}</p>}
+                        </div>
+
+                        
+                        <div className="w-full mx-auto">
+                            <label htmlFor='zipcode' className="mb-1.5 block text-black font-medium dark:text-white font-figtree">
+                                Eircodes/Post code
+                                <span className="text-red-500 text-base ml-1">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id='zipcode'
+                                {...register("zipCode")}
+                                placeholder="Enter Eircodes/Post code"
+                                className={`w-full rounded-md border bg-zinc-100  py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.zipCode ? 'border-danger' : 'dark:text-white border-stroke '}`}
+                            />
+                            {errors?.zipCode && <p className="text-red-500 text-sm col-span-2 font-figtree">{errors?.zipCode?.message}</p>}
+                        </div>
+                    </div> */}
 
                     {/* ---------------service---------------- */}
                     <div className='w-full mx-auto mb-4'>
@@ -173,14 +266,14 @@ const SignUpForm = () => {
                             errors={errors}
                             placeholder='select service'
                             validationRules={{
-                                required: "Service is required",
+                                required: "Select minimum 1 service",
                             }}
                         />
+                        {errors?.userServices && <p className="text-red-500 text-sm col-span-2 font-figtree ">{errors?.userServices?.message}</p>}
                     </div>
 
                     {/* -----------------Password Input-------------- */}
                     <div className="w-full mx-auto mb-4">
-
                         <PasswordInput
                             name="password"
                             label={"Password"}
@@ -197,7 +290,6 @@ const SignUpForm = () => {
                                 },
                             }}
                         />
-
                     </div>
 
                     {/* -----------------Confirm Password Input-------------- */}

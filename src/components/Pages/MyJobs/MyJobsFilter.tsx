@@ -8,7 +8,7 @@ import { format } from "date-fns"
 import { DateRange } from "react-day-picker"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-const MyJobsFilter = ({ date, setDate, setDebouncedSearchTerm, setStatus }: { date: DateRange | undefined, setDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>, setDebouncedSearchTerm: React.Dispatch<React.SetStateAction<string>>, setStatus: React.Dispatch<React.SetStateAction<string>> }) => {
+const MyJobsFilter = ({ date, setDate, setDebouncedSearchTerm, setStatus }: { date: DateRange | undefined, setDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>, setDebouncedSearchTerm: React.Dispatch<React.SetStateAction<string>>, setStatus: React.Dispatch<React.SetStateAction<string | boolean>> }) => {
 
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -71,8 +71,8 @@ const MyJobsFilter = ({ date, setDate, setDebouncedSearchTerm, setStatus }: { da
                 </SelectTrigger>
                 <SelectContent className="rounded-sm text-sm font-figtree bg-form">
                     {
-                        [{ label: "All", value: "all" }, { label: "In progress", value: "PENDING" }, { label: "Accepted", value: "COMPLETED" }]?.map(item => {
-                            return <SelectItem key={item?.label} value={item?.value} className="h-10 font-figtree text-base font-medium hover:!bg-white">{item?.label}</SelectItem>
+                        [{ label: "All", value: "all" }, { label: "In progress", value: false }, { label: "Completed", value: true }]?.map(item => {
+                            return <SelectItem key={item?.label} value={item?.value.toString()} className="h-10 font-figtree text-base font-medium hover:!bg-white">{item?.label}</SelectItem>
                         })
                     }
                 </SelectContent>

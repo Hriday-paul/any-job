@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { job_prefered_days, times } from '../../../../utils/default';
+import { counties, job_prefered_days, times } from '../../../../utils/default';
 import { Calendar } from "@/components/ui/calendar"
 import {
     Popover,
@@ -20,19 +20,19 @@ import contact_icon from '../../../../public/contact_icon.png'
 import jobDetailsIcon from '../../../../public/job_details_icon.png'
 import { ImSpinner2 } from "react-icons/im";
 import Swal from 'sweetalert2'
-import SelectJobLocation from '@/components/Shared/SelectJobLocation';
 import { useServicesQuery } from '@/redux/api/serviceApi';
 import { toast } from 'sonner';
-import { useGetAddreessByGoogleQuery, usePostJobMutation } from '@/redux/api/jobsApi';
+import { usePostJobMutation } from '@/redux/api/jobsApi';
 import { useSearchParams } from 'next/navigation';
 
 export type postJobType = {
     title: string,
     description: string,
     service: string,
-    address: string,
-    // county: string,
-    // town: string,
+    country: string,
+    state: string,
+    city: string,
+    zipCode: string,
     dates: string
     preferredJobDate: Date,
     time: string,
@@ -41,7 +41,7 @@ export type postJobType = {
     firstName: string,
     lastName: string,
     email: string,
-    phoneNumber: string
+    phoneNumber: string,
 }
 
 const AddForm = () => {
@@ -52,9 +52,9 @@ const AddForm = () => {
 
     const defaultService = useSearchParams().get('service');
 
-    const [coordinates, setCoordinates] = useState<{ lat: number, lng: number }>({ lat: 53.3498, lng: -6.2603 })
+    // const [coordinates, setCoordinates] = useState<{ lat: number, lng: number }>({ lat: 53.3498, lng: -6.2603 })
 
-    const { isSuccess: addressSuccess, data: address } = useGetAddreessByGoogleQuery(coordinates);
+    // const { isSuccess: addressSuccess, data: address } = useGetAddreessByGoogleQuery(coordinates);
 
 
     const [images, setImages] = useState<File[]>([]);
@@ -70,7 +70,8 @@ const AddForm = () => {
         defaultValues: {
             preferredJobDate: new Date(),
             dates: "Flexible",
-            service: defaultService || ''
+            service: defaultService || '',
+            country: "Ireland"
         }
     });
 
@@ -90,16 +91,12 @@ const AddForm = () => {
     }, [images])
 
     const handleFormSubmit: SubmitHandler<postJobType> = async (data) => {
-        console.log(data?.dates)
-        if (!coordinates) {
-            toast.error("Please, select your job location.")
-            return;
-        }
+
         try {
 
             const form = new FormData();
 
-            form.append("data", JSON.stringify({ ...data, dates: [data?.dates], latitude: coordinates?.lat, longitude: coordinates?.lng }));
+            form.append("data", JSON.stringify({ ...data, dates: [data?.dates], }));
 
             images?.forEach(img => {
                 form.append("additionalDetails", img)
@@ -133,47 +130,47 @@ const AddForm = () => {
         }
     }
 
-    useEffect(() => {
-        if (addressSuccess) {
+    // useEffect(() => {
+    //     if (addressSuccess) {
 
-            let newAddress = null;
+    //         let newAddress = null;
 
-            // Loop through results to find an address that is not a Plus Code
-            for (const result of address.results) {
-                if (!result.plus_code) {
-                    newAddress = result.formatted_address;
-                    break;
-                }
-            }
+    //         // Loop through results to find an address that is not a Plus Code
+    //         for (const result of address.results) {
+    //             if (!result.plus_code) {
+    //                 newAddress = result.formatted_address;
+    //                 break;
+    //             }
+    //         }
 
-            // Fallback to first result if no valid address found
-            if (!newAddress) {
-                newAddress = address?.results[0].formatted_address;
-            }
+    //         // Fallback to first result if no valid address found
+    //         if (!newAddress) {
+    //             newAddress = address?.results[0].formatted_address;
+    //         }
 
-            reset({ address: newAddress })
-        }
-    }, [addressSuccess, address])
+    //         reset({ address: newAddress })
+    //     }
+    // }, [addressSuccess, address])
 
     // -----------------set default geolocation----------------
-    useEffect(() => {
-        if (!navigator.geolocation) {
-            console.log("geolocation is not support")
-            return;
-        }
+    // useEffect(() => {
+    //     if (!navigator.geolocation) {
+    //         console.log("geolocation is not support")
+    //         return;
+    //     }
 
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                setCoordinates({
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude,
-                });
-            },
-            (err) => {
-                console.log(err?.message)
-            }
-        );
-    }, []);
+    //     navigator.geolocation.getCurrentPosition(
+    //         (position) => {
+    //             setCoordinates({
+    //                 lat: position.coords.latitude,
+    //                 lng: position.coords.longitude,
+    //             });
+    //         },
+    //         (err) => {
+    //             console.log(err?.message)
+    //         }
+    //     );
+    // }, []);
 
     return (
         <div className='bg-[#fff9f9] p-5 md:p-8 max-w-xl md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] relative -mt-10 md:-mt-24 lg:-mt-32 z-20 mb-20 rounded-xl'>
@@ -254,39 +251,39 @@ const AddForm = () => {
                 </div>
 
                 {/* ---------select job location------------ */}
-                <div className="w-full mx-auto mb-5 mt-5">
+                {/* <div className="w-full mx-auto mb-5 mt-5">
                     <label htmlFor='loc' className="mb-1.5 block text-black dark:text-white font-figtree">
                         Mark Job Location for get message contractors in your area
                         <span className="text-red-500 text-base ml-1">*</span>
                     </label>
                     <SelectJobLocation coordinates={coordinates} setCoordinates={setCoordinates} height='300px' />
-                </div>
+                </div> */}
 
-                {/* ---------select address------------ */}
+                {/* ---------select country------------ */}
                 <div className="w-full mx-auto mb-3">
-                    <label htmlFor='Address' className="mb-1.5 block text-black dark:text-white font-figtree">
-                        Address
+                    <label htmlFor='country' className="mb-1.5 block text-black dark:text-white font-figtree">
+                        Country
                         <span className="text-red-500 text-base ml-1">*</span>
                     </label>
                     <input
                         type="text"
-                        id='Address'
-                        {...register("address", { required: true })}
-                        placeholder="city, state, country"
-                        className={`w-full rounded-md bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] border-[1.5px] bg-transparent py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-poppins ${errors?.address ? 'border-danger' : 'dark:text-white border-strokeinput focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
+                        id='country'
+                        {...register("country", { required: true })}
+                        placeholder="country"
+                        disabled
+                        className={`w-full rounded-md bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] border-[1.5px] bg-transparent py-2.5 px-4 text-black outline-none transition disabled:cursor-not-allowed disabled:bg-white dark:bg-form-input font-figtree placeholder:font-poppins ${errors?.country ? 'border-danger' : 'dark:text-white border-strokeinput focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
                     />
-                    {errors?.address && <p className="text-red-500 text-sm col-span-2">{errors?.address?.message}</p>}
+                    {errors?.country && <p className="text-red-500 text-sm col-span-2">{errors?.country?.message}</p>}
                 </div>
 
-
                 {/* ------------------------county------------------ */}
-                {/* <div className="w-full mx-auto mb-3">
+                <div className="w-full mx-auto mb-3">
                     <label htmlFor='brand' className="mb-1.5 block text-black dark:text-white font-figtree">
-                        County
+                        County/State
                         <span className="text-red-500 text-base ml-1">*</span>
                     </label>
                     <Controller
-                        name={'county'}
+                        name={'state'}
                         control={control}
                         rules={{
                             required: true,
@@ -296,7 +293,7 @@ const AddForm = () => {
                                 onValueChange={field.onChange}
                                 defaultValue={field.value}
                             >
-                                <SelectTrigger className={`bg-form px-4 py-3 rounded-md  text-sm font-figtree w-full text-primary bg-secondary border shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] ${errors?.county ? "font-medium  border-danger" : "border-strokeinput"}`}>
+                                <SelectTrigger className={`bg-form px-4 py-3 rounded-md  text-sm font-figtree w-full text-primary bg-secondary border shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] ${errors?.state ? "font-medium  border-danger" : "border-strokeinput"}`}>
                                     <SelectValue placeholder={"County"} />
                                 </SelectTrigger>
                                 <SelectContent className="rounded-sm text-sm font-figtree bg-form">
@@ -310,11 +307,11 @@ const AddForm = () => {
                         )} >
 
                     </Controller>
-                    {errors?.county && <p className="text-red-500 text-sm col-span-2">{errors?.county?.message}</p>}
-                </div> */}
+                    {errors?.state && <p className="text-red-500 text-sm col-span-2">{errors?.state?.message}</p>}
+                </div>
 
                 {/* ---------town------------ */}
-                {/* <div className="w-full mx-auto mb-3">
+                <div className="w-full mx-auto mb-3">
                     <label htmlFor='town' className="mb-1.5 block text-black dark:text-white font-figtree">
                         Town/City
                         <span className="text-red-500 text-base ml-1">*</span>
@@ -322,12 +319,28 @@ const AddForm = () => {
                     <input
                         type="text"
                         id='town'
-                        {...register("town", { required: true })}
-                        placeholder="Enter specific location"
-                        className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.town ? 'border-danger' : 'dark:text-white border-strokeinput focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
+                        {...register("city", { required: true })}
+                        placeholder="Enter specific city"
+                        className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.city ? 'border-danger' : 'dark:text-white border-strokeinput focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
                     />
-                    {errors?.town && <p className="text-red-500 text-sm col-span-2">{errors?.town?.message}</p>}
-                </div> */}
+                    {errors?.city && <p className="text-red-500 text-sm col-span-2">{errors?.city?.message}</p>}
+                </div>
+
+                {/* ------------post Code------------ */}
+                <div className="w-full mx-auto mb-3">
+                    <label htmlFor='postcode' className="mb-1.5 block text-black dark:text-white font-figtree">
+                        Eircodes/Post code
+                        {/* <span className="text-red-500 text-base ml-1">*</span> */}
+                    </label>
+                    <input
+                        type="text"
+                        id='postcode'
+                        {...register("zipCode")}
+                        placeholder="Enter Eircodes / Post code"
+                        className={`w-full rounded-md border-[1.5px] bg-form shadow-[0_4px_18px_0_rgba(0,0,0,0.09)] py-2.5 px-4 text-black outline-none transition disabled:cursor-default disabled:bg-whiter dark:bg-form-input font-figtree placeholder:font-figtree ${errors?.zipCode ? 'border-danger' : 'dark:text-white border-strokeinput focus:border-primary active:border-primary dark:border-form-strokedark dark:focus:border-primary'}`}
+                    />
+                    {errors?.zipCode && <p className="text-red-500 text-sm col-span-2">{errors?.zipCode?.message}</p>}
+                </div>
 
                 <div className='flex items-center gap-x-2 py-3 lg:py-4'>
                     <Image src={calander_icon} placeholder='blur' className='w-auto h-5 lg:h-7 object-cover' alt="any job details icon" />

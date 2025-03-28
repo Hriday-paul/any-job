@@ -23,15 +23,17 @@ const PricingCard = ({ packag }: { packag: packageType }) => {
             setOpen(true);
             return;
         }
-
+        const loadingToast = toast.loading("Loading...", { position: "top-center" })
         try {
-            const loadingToast = toast.loading("Loading...", { position: "top-center" })
+
             const res = await postSubscription({ packageId: packageId }).unwrap();
             toast.dismiss(loadingToast)
             router.push(res?.data?.paymentLink);
         }
         catch (err: any) {
             toast.error(err?.data?.message || 'Something went wrong, try again');
+        } finally {
+            toast.dismiss(loadingToast)
         }
     }
 

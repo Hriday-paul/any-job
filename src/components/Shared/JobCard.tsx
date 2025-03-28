@@ -40,7 +40,7 @@ export default function JobCard({ job }: { job: jobType }) {
                 <div className="space-y-2">
                     <div>
                         <span className="font-medium font-figtree">Location: </span>
-                        <span className="text-gray-600 font-figtree">{job?.address}</span>
+                        <span className="text-gray-600 font-figtree">{job?.city}, {job?.state}, {job?.country}</span>
                     </div>
                     {/* <div>
                         <span className="font-medium font-figtree">Town: </span>
@@ -75,7 +75,7 @@ export default function JobCard({ job }: { job: jobType }) {
                 {/* Availability Buttons */}
                 <div className="grid grid-cols-1 gap-4">
                     <SendQuote id={job?.id} clicker={<button className="w-full py-2 bg-primary_red text-white rounded-md hover:bg-primary_red transition-colors font-figtree">
-                        Available
+                        Quote
                     </button>}></SendQuote>
                     {/* <button className="w-full py-2 bg-white border border-primary_red text-primary_red rounded-md hover:bg-primary_red hover:text-white transition-colors">
                         Not Available

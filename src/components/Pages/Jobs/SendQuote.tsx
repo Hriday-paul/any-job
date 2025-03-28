@@ -4,17 +4,12 @@ import {
     DialogContent,
     DialogDescription,
     DialogHeader,
-    DialogClose,
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { CalendarIcon } from "lucide-react";
 import React, { useState } from "react";
 import Swal from "sweetalert2";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { format } from "date-fns";
-import { Calendar } from "@/components/ui/calendar";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { useSendQuoteMutation } from "@/redux/api/jobsApi";
 import { ImSpinner2 } from "react-icons/im";
 import { DateTimePicker } from "@/components/ui/DateTimePicker";
@@ -35,32 +30,28 @@ export function SendQuote({ clicker, id }: { clicker: React.ReactNode, id: strin
         register,
         handleSubmit,
         control,
-        watch,
         formState: { errors },
     } = useForm<sendQuoteType>();
 
     const handleFormSubmit: SubmitHandler<sendQuoteType> = async (data) => {
 
         try {
-            const res = await postQuote({ jobId: id, message: data?.message, price: Number(data?.price), scheduleDateTime: data?.date, availability: "available" })
+            await postQuote({ jobId: id, message: data?.message, price: Number(data?.price), scheduleDateTime: data?.date, availability: "available" })
 
-            if (res?.data?.success) {
-
-                Swal.fire({
-                    title: "Your quotes has been send successfully!",
-                    text: "Job poster will review your quotes. You’ll be notified in you email when a quote arrives.",
-                    icon: "success",
-                    customClass: {
-                        title: "text-xl text-black font-medium font-figtree",
-                        container: "text-sm font-medium font-figtree text-zinc-800",
-                        cancelButton: "bg-primary_red text-white",
-                        confirmButton: "bg-primary_red text-white"
-                    },
-                    showCancelButton: true,
-                    showConfirmButton: false,
-                    cancelButtonText: "Close",
-                });
-            }
+            Swal.fire({
+                title: "Your quotes has been send successfully!",
+                text: "Job poster will review your quotes. You’ll be notified in you email when a quote arrives.",
+                icon: "success",
+                customClass: {
+                    title: "text-xl text-black font-medium font-figtree",
+                    container: "text-sm font-medium font-figtree text-zinc-800",
+                    cancelButton: "bg-primary_red text-white",
+                    confirmButton: "bg-primary_red text-white"
+                },
+                showCancelButton: true,
+                showConfirmButton: false,
+                cancelButtonText: "Close",
+            });
 
         } catch (err: any) {
             Swal.fire({

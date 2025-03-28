@@ -21,7 +21,8 @@ export type userResType =
         "location": string | null,
         "minPricing": number | null,
         "maxPricing": number | null,
-        stripeAccountId ?: string,
+        stripeAccountId?: string,
+        serviceAreas: string[],
         "myServices": {
             "id": string,
             "userId": string,
@@ -83,7 +84,7 @@ export type packageType = {
 export type servicesType = {
     "id": string,
     "name": string,
-    description : string,
+    description: string,
     "image": string,
     "createdAt": string,
     "updatedAt": string
@@ -127,7 +128,8 @@ export type jobType = {
     "userId": string,
     "createdAt": string,
     "updatedAt": string,
-    "distance": string
+    "distance": string,
+    state: string,
 }
 
 export type myjobsType = {
@@ -138,10 +140,12 @@ export type myjobsType = {
     "scheduleDateTime": string,
     "availability": string,
     "message": string,
-    "status": "PENDING" | "COMPLETED",
-    "paymentStatus": "PAID" | "UNPAID",
-    "createdAt": "2025-03-17T15:26:35.787Z",
-    "updatedAt": "2025-03-17T15:26:35.787Z",
+    "completeDate": string | null,
+    "status": "APPROVED" | "PENDING",
+    isComplete : boolean,
+    "paymentStatus": "PAID"|"UNPAID",
+    "createdAt": string,
+    "updatedAt": string,
     "job": jobType,
     "user": {
         "firstName": string,
@@ -167,13 +171,13 @@ export type currentSubscriptionType = {
     "createdAt": string,
     "updatedAt": string,
     "package": {
-            "id": string,
-            "name": string,
-            "description": string,
-            "interval": "month",
-            "price": 10,
-            "stripePriceId": null,
-            "createdAt": "2025-03-11T11:03:49.411Z",
-            "updatedAt": "2025-03-11T11:03:49.411Z"
-        }
+        "id": string,
+        "name": string,
+        "description": string,
+        "interval": "month",
+        "price": 10,
+        "stripePriceId": null,
+        "createdAt": "2025-03-11T11:03:49.411Z",
+        "updatedAt": "2025-03-11T11:03:49.411Z"
+    }
 }

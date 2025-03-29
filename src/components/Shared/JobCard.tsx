@@ -42,10 +42,10 @@ export default function JobCard({ job }: { job: jobType }) {
                         <span className="font-medium font-figtree">Location: </span>
                         <span className="text-gray-600 font-figtree">{job?.city}, {job?.state}, {job?.country}</span>
                     </div>
-                    {/* <div>
-                        <span className="font-medium font-figtree">Town: </span>
-                        <span className="text-gray-600 font-figtree">Swords</span>
-                    </div> */}
+                    <div>
+                        <span className="font-medium font-figtree">Eircodes: </span>
+                        <span className="text-gray-600 font-figtree">{job?.zipCode || "------------"}</span>
+                    </div>
                     <div>
                         <span className="font-medium font-figtree">Preferred Schedule: </span>
                         <span className="text-gray-600 font-figtree">{moment(job?.preferredJobDate).format('MMMM Do YYYY')} {job?.dates && (job?.dates)} - {job?.time || "flexible time"}</span>

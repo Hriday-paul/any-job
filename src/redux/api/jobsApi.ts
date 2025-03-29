@@ -25,8 +25,8 @@ const jobsApi = baseApi.injectEndpoints({
                 method: 'POST',
                 body: data
             }),
-
         }),
+
         sendQuote: builder.mutation<{ message: string, success: boolean }, {
             "jobId": string,
             "price": number,
@@ -39,7 +39,7 @@ const jobsApi = baseApi.injectEndpoints({
                 method: 'POST',
                 body: data
             }),
-            invalidatesTags: ['jobs']
+            invalidatesTags: ['jobs', 'quote']
         }),
 
         MyJobs: builder.query<{ message: string, success: boolean, data: myjobsType[], meta: { totalPage: number } }, any>({
@@ -47,7 +47,8 @@ const jobsApi = baseApi.injectEndpoints({
                 url: `/quote/my-quotes-as-contractor`,
                 method: 'GET',
                 params: query
-            })
+            }),
+            providesTags: ['quote']
         }),
 
         jobStatusUpdate: builder.mutation<{ message: string, success: boolean }, { id: string, data: any }>({
@@ -56,7 +57,7 @@ const jobsApi = baseApi.injectEndpoints({
                 method: 'PATCH',
                 body: data
             }),
-
+            invalidatesTags: ['quote']
         }),
 
         quotesByJob: builder.query<{ message: string, success: boolean, data: myjobsType[] }, { token: string }>({

@@ -24,7 +24,7 @@ const PendingQuotes = () => {
 
     const [page, setPage] = useState<number>(1);
 
-    const { isLoading, isSuccess, data, isError } = useMyJobsQuery({ staus: "PENDING", page: page });
+    const { isLoading, isSuccess, data, isError } = useMyJobsQuery({ status: "PENDING", page: page });
 
     return (
         <div className="pt-5 lg:pt-8">

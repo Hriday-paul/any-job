@@ -130,6 +130,7 @@ export type jobType = {
     "updatedAt": string,
     "distance": string,
     state: string,
+    zipCode : string | null
 }
 
 export type myjobsType = {

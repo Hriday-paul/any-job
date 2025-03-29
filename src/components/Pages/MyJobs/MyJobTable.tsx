@@ -30,6 +30,7 @@ function MyJobTable({ data, totalPage, setPage }: { data: myjobsType[], totalPag
     const [postUpdateStatusJob, { isLoading }] = useJobStatusUpdateMutation();
 
     const CancelCompleteJob = async (id: string) => {
+        const loading = toast.loading("Loading...")
         try {
             await postUpdateStatusJob({
                 id: id, data: {
@@ -39,6 +40,9 @@ function MyJobTable({ data, totalPage, setPage }: { data: myjobsType[], totalPag
             toast.success("Job update successfully")
         } catch (err: any) {
             toast.error(err?.data?.message || "Something went wrong, try again")
+        }
+        finally {
+            toast.dismiss(loading)
         }
     }
     return (

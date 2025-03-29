@@ -35,7 +35,7 @@ const ContructorProfileBio = ({ profileData }: { profileData: userResType }) => 
                 <h2 className="text-xl font-figtree font-bold text-gray-900">Service Offer</h2>
                 <div className="flex flex-row flex-wrap gap-3">
                     {profileData?.myServices?.map((service) => (
-                        <span key={service?.id} className="px-3.5 py-1.5 text-base font-figtree font-medium bg-red-50 text-primary_red rounded-full">
+                        <span key={service?.id} className="px-2.5 md:px-3.5 py-1 md:py-1.5 text-sm md:text-base font-figtree font-medium bg-red-50 text-primary_red rounded-full">
                             {service?.service?.name}
                         </span>
                     ))}

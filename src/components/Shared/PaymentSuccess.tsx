@@ -33,7 +33,7 @@ function PaymentSuccess() {
                         </div>
                         <div>
                             <p className="text-center text-gray-600 mb-6 font-figtree">
-                                Thank you for your purchase. Your payment has been processed successfully.
+                                Thank you for your payment. Your payment has been processed successfully.
                             </p>
                         </div>
                         <div className="flex flex-row gap-x-4 items-center">

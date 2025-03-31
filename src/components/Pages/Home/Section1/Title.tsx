@@ -20,8 +20,8 @@ const Title = () => {
                         duration: 0.6
                     }
                 }}
-                className='text-primary_gray text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-bold font-figtree text-center leading-8 md:leading-tight -mt-1 capitalize lg:mb-6 xl:mb-8'>
-                Find skilled people, professionals <br /> and <span className='text-primary_red'>contractors</span> effortlessly.
+                className='text-primary_gray text-2xl md:text-4xl lg:text-5xl xl:text-5xl font-bold font-figtree text-center leading-8 md:leading-relaxed -mt-1 capitalize lg:mb-6 xl:mb-8'>
+                Every job, Big or Small, Done <br/> with Excellence.
             </motion.h1>
             <motion.h2
                 initial={{ y: 15, opacity: 0 }}

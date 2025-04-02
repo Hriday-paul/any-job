@@ -11,6 +11,8 @@ const SingleService = ({ id }: { id: string }) => {
 
     const { isLoading, isError, isSuccess, data } = useSingleServiceQuery({ id })
 
+    console.log(data?.data)
+
     return (
         <div>
 
@@ -34,7 +36,7 @@ const SingleService = ({ id }: { id: string }) => {
 
                         <h2 className='text-xl md:text-2xl xl:text-3xl font-figtree font-semibold text-black pb-5'>{data?.data?.name}</h2>
 
-                        <Image src={data?.data?.image} height={5000} width={5000} className='w-full mx-auto h-60 md:h-96 lg:h-[450px] xl:h-[500px] object-cover' placeholder='blur' alt="serviceImg" blurDataURL={placeHolderBlurImg} />
+                        <Image src={data?.data?.image || "/empty_work_image.jpeg"} height={5000} width={5000} className='w-full mx-auto h-60 md:h-96 lg:h-[450px] xl:h-[500px] object-cover' placeholder='blur' alt="serviceImg" blurDataURL={placeHolderBlurImg} />
 
                         <article className='font-figtree text-zinc-800 py-5'>
                             {data?.data?.description}

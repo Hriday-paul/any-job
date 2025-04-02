@@ -1,26 +1,26 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
-import { servicesType } from '@/redux/types';
+import { categorieType, servicesType } from '@/redux/types';
 import { placeHolderBlurImg } from '../../../../utils/default';
 import { HiArrowUpRight } from 'react-icons/hi2';
 
-const ServiceCard = ({ service }: { service: servicesType }) => {
+const ServiceCard = ({ service }: { service: categorieType }) => {
     return (
         <div className='shadow-md bg-white rounded-lg p-5 group'>
-            <Link href={`/services/${service?.id}`} className="">
-                <Image
-                    src={service?.image || "/empty_work_image.jpeg"}
-                    placeholder='blur'
-                    blurDataURL={placeHolderBlurImg}
-                    alt="service Image"
-                    width={2000}
-                    height={2000}
-                    className="w-full h-52 object-cover rounded-md"
-                />
-            </Link>
-            <div className="space-y-4">
-                <div>
+            {/* <Link href={`/services/${service?.id}`} className=""> */}
+            <Image
+                src={service?.image || "/empty_work_image.jpeg"}
+                placeholder='blur'
+                blurDataURL={placeHolderBlurImg}
+                alt="service Image"
+                width={2000}
+                height={2000}
+                className="w-full h-52 object-cover rounded-md"
+            />
+            {/* </Link> */}
+            <div className="">
+                {/* <div>
                     <Link href={`/services/${service?.id}`} className='flex justify-between items-center bg-red-50 py-2 px-4 mt-4 rounded-md'>
                         <h3 className='text-xl font-figtree font-semibold text-primary_red'>{service?.name}</h3>
 
@@ -29,18 +29,19 @@ const ServiceCard = ({ service }: { service: servicesType }) => {
                             <span className='-ml-[37px] h-8 w-8 bg-[#ffe3e5] rounded-full mt-0.5'></span>
                         </div>
                     </Link>
-                    {/* <article className="text-base font-medium text-gray-900 line-clamp-4 font-figtree">
-                        <Link href={`/services/${service?.id}`}>
-                            {service?.description}
-                        </Link>
-                    </article> */}
-                    {/* <div className="flex gap-2">
-                        {["Cleaning", "Repairing"].map((service) => (
-                            <span key={service} className="px-2 py-1 text-sm font-figtree font-medium bg-red-50 text-primary_red rounded-full">
-                                {service}
-                            </span>
-                        ))}
-                    </div> */}
+                    
+                </div> */}
+
+                <h3 className='text-xl font-figtree font-semibold text-primary_red py-4'>{service?.name}</h3>
+
+                <hr />
+
+                <div className='space-y-1 pt-2'>
+                    {
+                        service?.serviceLists?.map(item => {
+                            return <Link href={`/services/${item?.id}`}><h4 className='text-primary_red text-base font-medium hover:text-gray-800 duration-150'>{item?.name}</h4></Link>
+                        })
+                    }
                 </div>
 
                 {/* <div className="flex items-center justify-between">

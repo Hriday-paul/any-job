@@ -1,9 +1,16 @@
 
-import { servicesType } from "../types";
+import { categorieType, servicesType } from "../types";
 import baseApi from "./baseApi";
 
 const serviceApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
+        catregories: builder.query<{ message: string, data: categorieType[] }, any>({
+            query: (query) => ({
+                url: '/category/categories',
+                method: 'GET',
+                params: query
+            }),
+        }),
         services: builder.query<{ message: string, data: servicesType[] }, any>({
             query: (query) => ({
                 url: '/service-list/services',
@@ -28,4 +35,4 @@ const serviceApi = baseApi.injectEndpoints({
     })
 })
 
-export const { useServicesQuery, useDeleteWorkPhotoMutation, useSingleServiceQuery } = serviceApi;
+export const { useServicesQuery, useDeleteWorkPhotoMutation, useSingleServiceQuery, useCatregoriesQuery } = serviceApi;

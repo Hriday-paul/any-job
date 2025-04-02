@@ -90,6 +90,15 @@ export type servicesType = {
     "updatedAt": string
 }
 
+export type categorieType = {
+    "id": string,
+    "name": string,
+    "image": string,
+    "createdAt": string,
+    "updatedAt": string,
+    serviceLists : servicesType[]
+}
+
 export type jobType = {
     "id": string,
     "title": string,

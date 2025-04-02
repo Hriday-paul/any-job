@@ -11,7 +11,7 @@ import {
 
 import { MdOutlineArrowBackIosNew } from 'react-icons/md';
 import ServiceSearch from '@/components/Pages/Services/ServiceSearch';
-import { useServicesQuery } from '@/redux/api/serviceApi';
+import { useCatregoriesQuery, useServicesQuery } from '@/redux/api/serviceApi';
 import ServiceCard from '@/components/Pages/Services/ServiceCard';
 import ServiceLoadingCard from './ServiceLoadingCard';
 
@@ -31,7 +31,7 @@ const Services = () => {
         query["name"] = selectedServices?.join(',')
     }
 
-    const { isLoading, isSuccess, data: services } = useServicesQuery(query);
+    const { isLoading, isSuccess, data: categories } = useCatregoriesQuery(query);
 
     return (
         <div className='container py-10'>
@@ -79,23 +79,26 @@ const Services = () => {
                 </div>
 
 
-                <div className='col-span-1 lg:col-span-2 grid-cols-1 grid md:grid-cols-2 gap-5'>
-                    {
-                        isSuccess && services?.data?.map(service => {
-                            return <ServiceCard key={service?.id} service={service} />
-                        })
-                    }
+                <div className='col-span-1 lg:col-span-2 '>
+                    <div className='grid-cols-1 grid md:grid-cols-2 gap-5'>
+                        {
+                            isSuccess && categories?.data?.map(category => {
+                                return <ServiceCard key={category?.id} service={category} />
+                            })
+                        }
 
-                    {
-                        isLoading && <>
-                            <ServiceLoadingCard />
-                            <ServiceLoadingCard />
-                            <ServiceLoadingCard />
-                            <ServiceLoadingCard />
-                            <ServiceLoadingCard />
-                        </>
-                    }
+                        {
+                            isLoading && <>
+                                <ServiceLoadingCard />
+                                <ServiceLoadingCard />
+                                <ServiceLoadingCard />
+                                <ServiceLoadingCard />
+                                <ServiceLoadingCard />
+                            </>
+                        }
+                    </div>
                 </div>
+
             </div>
         </div>
     );

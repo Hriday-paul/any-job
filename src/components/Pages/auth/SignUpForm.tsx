@@ -19,13 +19,14 @@ type signUpType = {
     firstName: string,
     lastName: string,
     email: string,
-    userServices: string[]
+    userServices?: string[]
     password: string,
     confirmPassword: string,
     terms: boolean,
 
     country: string,
-    serviceAreas: string[],
+    serviceAreas?: string[],
+    role: string
     // city: string,
     // zipCode: string,
 }
@@ -43,7 +44,11 @@ const SignUpForm = () => {
         watch,
         reset,
         formState: { errors },
-    } = useForm<signUpType>();
+    } = useForm<signUpType>({
+        defaultValues: {
+            role: "CONTACTOR"
+        }
+    });
 
     const router = useRouter();
 
@@ -58,7 +63,8 @@ const SignUpForm = () => {
                 email: data?.email,
                 userServices: data?.userServices,
                 password: data?.password,
-                serviceAreas : data?.serviceAreas
+                serviceAreas: data?.serviceAreas,
+                role: data?.role
             }
 
             const form = new FormData();
@@ -75,11 +81,13 @@ const SignUpForm = () => {
                 secure: config.hasSSL,
             });
 
+            const next = data?.role == "CONTACTOR" ? "/pricing" : "/signin"
+
             reset()
 
             toast.success(res?.message || 'Signup successfully');
 
-            router.push('/verify-otp?next=/pricing')
+            router.push(`/verify-otp?next=${next}`)
 
         } catch (err: any) {
             toast.error(err?.data?.message || 'Something went wrong, try again');
@@ -110,6 +118,27 @@ const SignUpForm = () => {
                 </div>
 
                 <form onSubmit={handleSubmit(handleFormSubmit)} className=''>
+
+                    {/* -------------------check box---------------------- */}
+                    <div className="flex gap-10 justify-center my-6">
+                        <div className="inline-flex items-center">
+                            <label className="relative flex items-center cursor-pointer" htmlFor="user">
+                                <input {...register("role", { required: true })} value='USER' type="radio" className="peer h-5 w-5 cursor-pointer appearance-none rounded-full border border-slate-300 checked:border-slate-400 transition-all" id="user" />
+                                <span className="absolute bg-slate-800 w-3 h-3 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                                </span>
+                            </label>
+                            <label className="ml-2 text-primary cursor-pointer text-base font-poppins" htmlFor="user">User</label>
+                        </div>
+
+                        <div className="inline-flex items-center">
+                            <label className="relative flex items-center cursor-pointer" htmlFor="dealer">
+                                <input {...register("role", { required: true })} value='CONTACTOR' type="radio" className="peer h-5 w-5 cursor-pointer appearance-none rounded-full border border-slate-300 checked:border-slate-400 transition-all" id="dealer" />
+                                <span className="absolute bg-slate-800 w-3 h-3 rounded-full opacity-0 peer-checked:opacity-100 transition-opacity duration-200 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                                </span>
+                            </label>
+                            <label className="ml-2 text-primary cursor-pointer text-base font-poppins" htmlFor="dealer">Contructor</label>
+                        </div>
+                    </div>
 
                     <div className='flex flex-row gap-x-3 mb-4'>
                         {/* -----------------first name-------------- */}
@@ -167,36 +196,11 @@ const SignUpForm = () => {
                     </div>
 
                     {/* ------------------------county------------------ */}
-                    <div className="w-full mx-auto mb-4">
+                    {watch("role") == "CONTACTOR" && <div className="w-full mx-auto mb-4">
                         <label htmlFor='state' className="mb-1.5 block text-black dark:text-white font-figtree">
                             Service County/State
                             <span className="text-red-500 text-base ml-1">*</span>
                         </label>
-                        {/* <Controller
-                            name={'state'}
-                            control={control}
-                            rules={{
-                                required: true,
-                            }}
-                            render={({ field }) => (
-                                <Select
-                                    onValueChange={field.onChange}
-                                    defaultValue={field.value}
-                                >
-                                    <SelectTrigger className={`!bg-zinc-100 py-2.5 px-4 rounded-md  text-sm font-figtree w-full text-primary bg-secondary border ${errors?.state ? "font-medium  border-danger" : "border-stroke"}`}>
-                                        <SelectValue placeholder={"County"} />
-                                    </SelectTrigger>
-                                    <SelectContent className="rounded-sm text-sm font-figtree ">
-                                        {
-                                            counties?.map(item => {
-                                                return <SelectItem key={item} value={item} className="h-10 font-figtree text-base font-medium hover:bg-gray-100">{item}</SelectItem>
-                                            })
-                                        }
-                                    </SelectContent>
-                                </Select>
-                            )} >
-
-                        </Controller> */}
 
                         <MultipleSelect
                             name='serviceAreas'
@@ -212,7 +216,7 @@ const SignUpForm = () => {
                             }}
                         />
                         {errors?.serviceAreas && <p className="text-red-500 text-sm col-span-2 font-figtree">{errors?.serviceAreas?.message}</p>}
-                    </div>
+                    </div>}
 
 
                     {/* ---------------------city & post code------------------- */}
@@ -251,7 +255,7 @@ const SignUpForm = () => {
                     </div> */}
 
                     {/* ---------------service---------------- */}
-                    <div className='w-full mx-auto mb-4'>
+                    {watch("role") == "CONTACTOR" && <div className='w-full mx-auto mb-4'>
                         <label htmlFor='service' className="mb-1.5 block text-black font-medium dark:text-white font-figtree">
                             Which type of service offer you want to add?
                             <span className="text-red-500 text-base ml-1">*</span>
@@ -270,7 +274,7 @@ const SignUpForm = () => {
                             }}
                         />
                         {errors?.userServices && <p className="text-red-500 text-sm col-span-2 font-figtree ">{errors?.userServices?.message}</p>}
-                    </div>
+                    </div>}
 
                     {/* -----------------Password Input-------------- */}
                     <div className="w-full mx-auto mb-4">

@@ -12,7 +12,7 @@ const AuthApi = baseApi.injectEndpoints({
             }),
             // invalidatesTags: []
         }),
-        verifyOtp: builder.mutation<{ message: string, data: { "accessToken": string } }, { otp: number }>({
+        verifyOtp: builder.mutation<{ message: string, data: { "accessToken": string, role : "USER" | "CONTACTOR" } }, { otp: number }>({
             query: ({ otp }) => ({
                 url: '/auth/verify-account',
                 method: 'POST',

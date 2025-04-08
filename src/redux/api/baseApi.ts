@@ -34,15 +34,20 @@ const baseQueryWithReauth: typeof baseQuery = async (
 
     let result = await baseQuery(args, api, extraOptions);
 
+
+
     if (result?.error?.status === 401) {
+
+
 
         const refreshToken = cookies.get("refreshToken");
 
         if (refreshToken) {
+
             const refreshResult = await baseQuery(
                 {
                     url: "/auth/refresh-token",
-                    method: "GET",
+                    method: "POST",
                     headers: {
                         token: refreshToken
                     },
@@ -60,10 +65,10 @@ const baseQueryWithReauth: typeof baseQuery = async (
                 // Save the new token
                 cookies.set("accessToken", newAccessToken, {
                     httpOnly: false,
-                    maxAge: 14 * 24 * 60 * 60, // 7 days
+                    maxAge: 14 * 24 * 60 * 60, // 14 days
                     path: '/',
                     sameSite: 'lax',
-                    secure: process.env.production === 'production',
+                    secure: config.hasSSL,
                 });
 
                 // Retry the original request with the new token

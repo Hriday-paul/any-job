@@ -11,7 +11,7 @@ import { config } from '../../../../utils/config';
 const VerifyOtpForm = () => {
     const [postVerify, { isLoading }] = useVerifyOtpMutation();
     const [postResend, { isLoading: resendisLoading }] = useResendOtpMutation();
-    const [otp, setOtp] = useState<string>('0');
+    const [otp, setOtp] = useState<string>('');
     const nextRout = useSearchParams().get('next') || '/signin'
     const [resendTimer, setResendTimer] = useState<number>(0);
 
@@ -23,13 +23,16 @@ const VerifyOtpForm = () => {
         try {
             const res = await postVerify({ otp: Number(otp) }).unwrap();
 
-            setCookie('accessToken', res?.data?.accessToken, {
-                httpOnly: false,
-                maxAge: 14 * 24 * 60 * 60, // 14 days
-                path: '/',
-                sameSite: 'lax',
-                secure: config.hasSSL,
-            });
+            // -----------set accesss Token, when you are a contuctor. cause, you need to purchage a subscription--------
+            if (res?.data?.role == "CONTACTOR") {
+                setCookie('accessToken', res?.data?.accessToken, {
+                    httpOnly: false,
+                    maxAge: 14 * 24 * 60 * 60, // 14 days
+                    path: '/',
+                    sameSite: 'lax',
+                    secure: config.hasSSL,
+                });
+            }
 
             toast.success(res?.message || 'Verify successfully');
 
